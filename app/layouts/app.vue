@@ -45,9 +45,14 @@ const roleChip = computed(() => {
   return ctx.activeContext.membership?.role === 'owner' ? 'WŁAŚCICIEL' : 'PRACOWNIK'
 })
 
-const desktopItems = computed(() =>
-  desktopGroups.value.map(group => group.map(i => ({ ...i, active: isActive(i.to) })))
-)
+// Map active state per item; recurse into submenu children (parents have no `to`).
+function withActive(items) {
+  return items.map((item) => {
+    if (item.children) return { ...item, children: withActive(item.children) }
+    return { ...item, active: isActive(item.to) }
+  })
+}
+const desktopItems = computed(() => desktopGroups.value.map(group => withActive(group)))
 
 const userMenuItems = computed(() => [
   [{ label: displayName.value, type: 'label' }],
@@ -110,7 +115,7 @@ async function onSignOut() {
         v-else
         orientation="vertical"
         :items="desktopItems"
-        class="flex-1"
+        class="flex-1 min-h-0 overflow-y-auto"
       />
 
       <div
@@ -227,6 +232,7 @@ async function onSignOut() {
 
       <!-- Only this slot scrolls -->
       <main class="flex-1 overflow-y-auto pb-24 lg:pb-0">
+        <AppEmailVerifyBanner v-if="isLoggedIn" />
         <AuthTeaser v-if="showTeaser" />
         <div v-show="!showTeaser">
           <slot />

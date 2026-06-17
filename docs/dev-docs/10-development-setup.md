@@ -3,8 +3,8 @@
 ## Prerequisites
 
 - Node.js (see `.nvmrc` or `package.json` engines if present)
-- pnpm `11.5.2`
-- Firebase CLI (with the Emulator Suite for local work)
+- npm (bundled with Node.js)
+- Firebase CLI installed globally (with the Emulator Suite for local work) — `npm i -g firebase-tools`
 - Access to the **two Firebase projects** — DEV and PROD (see [Environments](#environments)) — each with Auth, Firestore, Storage, FCM, and App Check configured
 - A Stripe account with Connect enabled (test mode for LOCAL/DEV, live for PROD)
 
@@ -31,14 +31,25 @@ Key rules:
 ## Install
 
 ```bash
-pnpm install
+npm install
 ```
 
 ## Dev Server (LOCAL)
 
 ```bash
-firebase emulators:start    # Auth, Firestore, Storage emulators (start FIRST)
-pnpm dev                    # → http://localhost:9000, wired to the emulators
+npm run dev                 # → http://localhost:9000, wired to the emulators
+```
+
+`npm run dev` auto-starts the Firebase Emulator Suite (Auth, Firestore, Storage) if it
+isn't already running, waits until it's ready, then starts Nuxt. Emulators it starts are
+stopped when you stop the dev server; if you already have emulators running they're reused
+and left untouched. Emulator data is ephemeral — it's not persisted between runs.
+
+Escape hatches:
+
+```bash
+npm run emulators           # start only the emulators (e.g. in a separate terminal)
+npm run dev:nuxt            # start only Nuxt, without touching the emulators
 ```
 
 LOCAL runs against the Emulator Suite (see [Environments](#environments)); no cloud project is touched.
@@ -46,25 +57,25 @@ LOCAL runs against the Emulator Suite (see [Environments](#environments)); no cl
 ## Type Check
 
 ```bash
-pnpm typecheck
+npm run typecheck
 ```
 
 ## Lint
 
 ```bash
-pnpm lint
+npm run lint
 ```
 
 ## Build
 
 ```bash
-pnpm build
+npm run build
 ```
 
 ## Preview Production Build
 
 ```bash
-pnpm preview
+npm run preview
 ```
 
 ## Environment Variables

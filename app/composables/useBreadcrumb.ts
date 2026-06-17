@@ -13,8 +13,14 @@ const LABELS: Record<string, string> = {
   '/provider/finance': 'Panel',
   '/provider/settings': 'Ustawienia firmy',
   '/provider/profile': 'Profil firmy',
-  '/provider/me': 'Mój profil',
-  '/provider/staff': 'Zespół'
+  '/provider/me': 'Mój profil firmowy',
+  '/provider/reviews': 'Moje opinie',
+  '/provider/staff': 'Zespół',
+  '/provider/services': 'Usługi',
+  '/provider/locations': 'Lokalizacje i godziny',
+  '/app-settings/notifications': 'Powiadomienia',
+  '/app-settings/language': 'Język aplikacji',
+  '/app-settings/appearance': 'Wygląd'
 }
 
 export function useBreadcrumb() {

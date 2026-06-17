@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:nuxt": "nuxt dev",
+    "emulators": "firebase emulators:start",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
@@ -35,6 +37,5 @@
     "eslint": "^10.4.1",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.3"
-  },
-  "packageManager": "pnpm@11.5.2"
+  }
 }

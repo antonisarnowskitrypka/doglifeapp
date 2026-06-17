@@ -8,7 +8,11 @@ const MESSAGES: Record<string, string> = {
   'auth/email-already-in-use': 'Konto z tym adresem e-mail już istnieje.',
   'auth/weak-password': 'Hasło musi mieć co najmniej 6 znaków.',
   'auth/too-many-requests': 'Zbyt wiele prób. Spróbuj ponownie za chwilę.',
-  'auth/network-request-failed': 'Problem z połączeniem. Sprawdź internet i spróbuj ponownie.'
+  'auth/network-request-failed': 'Problem z połączeniem. Sprawdź internet i spróbuj ponownie.',
+  'auth/missing-email': 'Podaj adres e-mail.',
+  'auth/requires-recent-login': 'Ze względów bezpieczeństwa zaloguj się ponownie i spróbuj jeszcze raz.',
+  'auth/expired-action-code': 'Link wygasł. Poproś o nowy.',
+  'auth/invalid-action-code': 'Link jest nieprawidłowy lub został już użyty.'
 }
 
 export function authErrorMessage(e: unknown): string {

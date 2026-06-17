@@ -1,6 +1,6 @@
 <script setup>
 const { state, close } = useAuthModal()
-const { signInWithEmail, registerWithEmail } = useAuth()
+const { signInWithEmail, registerWithEmail, sendPasswordReset } = useAuth()
 const ctx = useContextStore()
 
 const tabItems = [
@@ -13,9 +13,39 @@ const signup = reactive({ displayName: '', email: '', password: '' })
 const loading = ref(false)
 const error = ref('')
 
+// Inline "forgot password" — expands under the login form (no separate view).
+const reset = reactive({ open: false, email: '', loading: false, sent: false, error: '' })
+
+function toggleReset() {
+  reset.open = !reset.open
+  reset.error = ''
+  reset.sent = false
+  if (reset.open && !reset.email) reset.email = login.email
+}
+
+async function onReset() {
+  reset.error = ''
+  if (!reset.email) {
+    reset.error = 'Podaj adres e-mail'
+    return
+  }
+  reset.loading = true
+  try {
+    await sendPasswordReset(reset.email)
+    reset.sent = true
+  } catch (e) {
+    // Don't reveal whether the account exists — treat "not found" as success.
+    if (e?.code === 'auth/user-not-found') reset.sent = true
+    else reset.error = authErrorMessage(e)
+  } finally {
+    reset.loading = false
+  }
+}
+
 watch(() => state.value.open, (open) => {
   if (!open) return
   error.value = ''
+  Object.assign(reset, { open: false, loading: false, sent: false, error: '' })
 })
 
 async function onSuccess() {
@@ -133,6 +163,51 @@ async function onSignup() {
                   :loading="loading"
                 />
               </UForm>
+
+              <div class="space-y-3">
+                <UButton
+                  variant="link"
+                  color="neutral"
+                  size="sm"
+                  class="px-0"
+                  :label="reset.open ? 'Ukryj' : 'Nie pamiętasz hasła?'"
+                  @click="toggleReset"
+                />
+                <div
+                  v-if="reset.open"
+                  class="space-y-3 rounded-lg border border-default p-3"
+                >
+                  <UAlert
+                    v-if="reset.sent"
+                    color="success"
+                    variant="subtle"
+                    icon="i-lucide-mail-check"
+                    title="Sprawdź skrzynkę"
+                    :description="`Jeśli istnieje konto dla ${reset.email}, wyślemy link do zresetowania hasła.`"
+                  />
+                  <template v-else>
+                    <UFormField
+                      label="E-mail"
+                      :error="reset.error"
+                    >
+                      <UInput
+                        v-model="reset.email"
+                        type="email"
+                        autocomplete="email"
+                        placeholder="ty@przyklad.pl"
+                        class="w-full"
+                      />
+                    </UFormField>
+                    <UButton
+                      label="Wyślij link resetu"
+                      color="neutral"
+                      block
+                      :loading="reset.loading"
+                      @click="onReset"
+                    />
+                  </template>
+                </div>
+              </div>
             </div>
           </template>
 

@@ -28,7 +28,8 @@ defineRouteMeta({
               required: ['uid', 'created'],
               properties: {
                 uid: { type: 'string' },
-                created: { type: 'boolean', description: 'true if the users doc was created on this call.' }
+                created: { type: 'boolean', description: 'true if the users doc was created on this call.' },
+                deletionCancelled: { type: 'boolean', description: 'true if signing in cancelled a pending account deletion.' }
               }
             }
           }
@@ -74,11 +75,23 @@ export default defineEventHandler(async (event) => {
       companyDetails: null,
       createdAt: FieldValue.serverTimestamp()
     })
-  } else {
+  }
+
+  // Signing in within the 7-day window halts a scheduled deletion (see /api/me/request-deletion).
+  const deletionCancelled = snap.exists && snap.get('deletionStatus') === 'pending'
+
+  if (snap.exists) {
     await ref.set({
       email: decoded.email ?? snap.get('email') ?? null,
       avatarUrl: decoded.picture ?? snap.get('avatarUrl') ?? null,
-      authProviders
+      authProviders,
+      ...(deletionCancelled
+        ? {
+            deletionStatus: FieldValue.delete(),
+            deletionRequestedAt: FieldValue.delete(),
+            deletionScheduledFor: FieldValue.delete()
+          }
+        : {})
     }, { merge: true })
   }
 
@@ -97,5 +110,5 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return { uid: decoded.uid, created: !snap.exists }
+  return { uid: decoded.uid, created: !snap.exists, deletionCancelled }
 })
