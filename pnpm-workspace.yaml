@@ -1,0 +1,30 @@
+allowBuilds:
+  '@firebase/util': set this to true or false
+  '@parcel/watcher': false
+  '@tailwindcss/oxide': false
+  esbuild: false
+  protobufjs: set this to true or false
+  sharp: set this to true or false
+  unrs-resolver: false
+  vue-demi: false
+minimumReleaseAgeExclude:
+  - '@nuxtjs/robots@6.1.0'
+  - '@nuxtjs/seo@5.3.0'
+  - '@nuxtjs/sitemap@8.2.0'
+  - '@scalar/agent-chat@0.12.10'
+  - '@scalar/api-client@3.10.3'
+  - '@scalar/api-reference@1.59.3'
+  - '@scalar/nuxt@0.6.46'
+  - '@scalar/oas-utils@0.18.4'
+  - '@scalar/schemas@0.4.3'
+  - '@scalar/sidebar@0.9.22'
+  - '@scalar/snippetz@0.9.16'
+  - '@scalar/types@0.13.3'
+  - '@scalar/workspace-store@0.54.3'
+  - nuxt-link-checker@5.1.0
+  - nuxt-og-image@6.6.0
+  - nuxt-schema-org@6.2.1
+  - nuxt-seo-utils@8.3.1
+  - nuxtseo-layer-devtools@5.2.6
+  - nuxtseo-shared@5.2.6
+  - nuxtseo-shared@5.3.0

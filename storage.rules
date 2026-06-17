@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Uploads/downloads go through Nuxt server routes (Admin SDK). Deny direct client access.
+// See docs/dev-docs/03-firebase-and-security.md and docs/dev-docs/23-storage.md.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,43 @@
+/**
+ * Main service categories — mirrors the platform `serviceCategories` catalogue
+ * (dev-docs/28-service-categories.md). Keys are stable; PL labels are local until the
+ * localized catalogue is wired. Colour = Tailwind palette name (ui-docs/00-ui-basics.md).
+ */
+export interface ServiceCategory {
+  key: string
+  label: string
+  icon: string
+  color: string
+}
+
+export const SERVICE_CATEGORIES: ServiceCategory[] = [
+  { key: 'trainer_behaviourist', label: 'Trener / behawiorysta', icon: 'i-lucide-graduation-cap', color: 'blue' },
+  { key: 'sport_training', label: 'Sport / trening', icon: 'i-lucide-medal', color: 'orange' },
+  { key: 'physiotherapy', label: 'Fizjoterapia', icon: 'i-lucide-activity', color: 'green' },
+  { key: 'grooming', label: 'Grooming', icon: 'i-lucide-scissors', color: 'violet' },
+  { key: 'dietitian', label: 'Dietetyk', icon: 'i-lucide-salad', color: 'amber' },
+  { key: 'facility_rental', label: 'Wynajem obiektu', icon: 'i-lucide-warehouse', color: 'slate' },
+  { key: 'petsitting', label: 'Opieka (petsitting)', icon: 'i-lucide-heart-handshake', color: 'pink' },
+  { key: 'photography', label: 'Fotografia', icon: 'i-lucide-camera', color: 'cyan' }
+]
+
+export const CATEGORY_KEYS = SERVICE_CATEGORIES.map(c => c.key)
+
+export const SPECIES = [
+  { key: 'dog', label: 'Psy' },
+  { key: 'cat', label: 'Koty' }
+]
+
+/** Spoken languages offered for staff profiles (ISO-ish codes). Extend as needed. */
+export const LANGUAGES = [
+  { value: 'pl', label: 'Polski' },
+  { value: 'en', label: 'English' },
+  { value: 'de', label: 'Deutsch' },
+  { value: 'uk', label: 'Українська' },
+  { value: 'ru', label: 'Русский' },
+  { value: 'bg', label: 'Български' },
+  { value: 'es', label: 'Español' },
+  { value: 'fr', label: 'Français' },
+  { value: 'it', label: 'Italiano' },
+  { value: 'cs', label: 'Čeština' }
+]

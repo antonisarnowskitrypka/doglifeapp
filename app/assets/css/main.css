@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* Colors come from Nuxt UI aliases (primary: teal, neutral: stone) in app.config.ts —
+   light/dark are generated, so we don't hand-maintain hex. Keep custom CSS minimal. */
+@theme static {
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+}

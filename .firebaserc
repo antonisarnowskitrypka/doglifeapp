@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "demo-doglifeapp",
+    "dev": "doglife-dev",
+    "prod": "doglife-prod"
+  }
+}
