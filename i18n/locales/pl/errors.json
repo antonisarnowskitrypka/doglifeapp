@@ -1,0 +1,49 @@
+{
+  "errors": {
+    "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+    "auth": {
+      "invalidEmail": "Nieprawidłowy adres e-mail.",
+      "userDisabled": "To konto zostało zablokowane.",
+      "userNotFound": "Nie znaleziono konta z tym adresem e-mail.",
+      "wrongPassword": "Nieprawidłowy e-mail lub hasło.",
+      "invalidCredential": "Nieprawidłowy e-mail lub hasło.",
+      "emailAlreadyInUse": "Konto z tym adresem e-mail już istnieje.",
+      "weakPassword": "Hasło musi mieć co najmniej 6 znaków.",
+      "tooManyRequests": "Zbyt wiele prób. Spróbuj ponownie za chwilę.",
+      "networkRequestFailed": "Problem z połączeniem. Sprawdź internet i spróbuj ponownie.",
+      "missingEmail": "Podaj adres e-mail.",
+      "requiresRecentLogin": "Ze względów bezpieczeństwa zaloguj się ponownie i spróbuj jeszcze raz.",
+      "expiredActionCode": "Link wygasł. Poproś o nowy.",
+      "invalidActionCode": "Link jest nieprawidłowy lub został już użyty."
+    },
+    "api": {
+      "org": {
+        "forbidden": "Brak uprawnień w tej organizacji.",
+        "notFound": "Nie znaleziono firmy.",
+        "nameMin": "Nazwa firmy musi mieć min. 2 znaki.",
+        "categoryRequired": "Wybierz co najmniej jedną kategorię.",
+        "speciesRequired": "Zaznacz co najmniej jeden gatunek."
+      },
+      "staff": {
+        "notFound": "Nie znaleziono członka zespołu.",
+        "editForbidden": "Brak uprawnień do edycji tego profilu.",
+        "cannotRemoveOwner": "Nie można usunąć właściciela.",
+        "invalidEmail": "Podaj prawidłowy adres e-mail.",
+        "alreadyMember": "Ta osoba jest już w zespole lub ma zaproszenie."
+      },
+      "profile": {
+        "nameEmpty": "Imię nie może być puste.",
+        "unsupportedLocale": "Nieobsługiwany język."
+      },
+      "invite": {
+        "notFound": "Zaproszenie nie istnieje lub zostało już rozpatrzone.",
+        "notYours": "To zaproszenie nie jest skierowane do Ciebie."
+      },
+      "upload": {
+        "invalidType": "Niedozwolony typ pliku (dozwolone: JPG, PNG, WEBP, HEIC).",
+        "tooLarge": "Plik za duży (maks. 10 MB).",
+        "noFile": "Brak pliku."
+      }
+    }
+  }
+}

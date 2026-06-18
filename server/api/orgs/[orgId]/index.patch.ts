@@ -5,7 +5,7 @@ const VALID_CATEGORIES = new Set([
 const VALID_SPECIES = new Set(['dog', 'cat'])
 
 defineRouteMeta({
-  openAPI: {
+  openAPI: openApiOperation({
     tags: ['Organizations'],
     summary: 'Update organization profile',
     description: 'Owner-only. Edits org name, description, categories, accepted species and company (invoice) details. See dev-docs/12 & 22.',
@@ -37,11 +37,11 @@ defineRouteMeta({
       401: { description: 'Missing or invalid auth token' },
       403: { description: 'Not an owner of this organization' }
     }
-  }
+  })
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
+  const orgId = getRequiredParam(event, 'orgId')
   await requireOrgRole(event, orgId, ['owner'])
 
   const body = await readBody<Record<string, unknown>>(event)
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
   if (body.name !== undefined) {
     const v = String(body.name).trim()
-    if (v.length < 2) throw createError({ statusCode: 400, statusMessage: 'Nazwa firmy min. 2 znaki.' })
+    if (v.length < 2) throw apiError(400, 'errors.api.org.nameMin')
     update.name = v.slice(0, 80)
   }
   if (body.description !== undefined) {
@@ -57,12 +57,12 @@ export default defineEventHandler(async (event) => {
   }
   if (body.categoryKeys !== undefined) {
     const keys = [...new Set((body.categoryKeys as string[]).filter(k => VALID_CATEGORIES.has(k)))]
-    if (!keys.length) throw createError({ statusCode: 400, statusMessage: 'Wybierz co najmniej jedną kategorię.' })
+    if (!keys.length) throw apiError(400, 'errors.api.org.categoryRequired')
     update.categoryKeys = keys
   }
   if (body.acceptedSpecies !== undefined) {
     const sp = [...new Set((body.acceptedSpecies as string[]).filter(s => VALID_SPECIES.has(s)))]
-    if (!sp.length) throw createError({ statusCode: 400, statusMessage: 'Zaznacz co najmniej jeden gatunek.' })
+    if (!sp.length) throw apiError(400, 'errors.api.org.speciesRequired')
     update.acceptedSpecies = sp
   }
   if (body.companyDetails !== undefined) {

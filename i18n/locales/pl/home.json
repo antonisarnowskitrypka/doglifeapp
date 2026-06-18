@@ -1,0 +1,44 @@
+{
+  "home": {
+    "meta": {
+      "title": "DogLife"
+    },
+    "anon": {
+      "title": "Witaj w DogLife",
+      "description": "Zaloguj się lub załóż konto, aby rezerwować usługi, zarządzać zwierzakami i prowadzić firmę.",
+      "availableTitle": "Dostępne bez logowania",
+      "searchServices": "Szukaj usług",
+      "settings": "Ustawienia"
+    },
+    "dashboard": {
+      "greeting": "Cześć, {name} 👋",
+      "fallbackName": "Opiekunie",
+      "subtitle": "Twój pulpit opiekuna."
+    },
+    "invites": {
+      "title": "Zaproszenia do firmy",
+      "role": "zaproszenie jako pracownik",
+      "join": "Dołącz",
+      "accepted": "Dołączono do firmy {name}.",
+      "error": "Nie udało się przyjąć zaproszenia."
+    },
+    "blocks": {
+      "nextBooking": {
+        "title": "Najbliższa rezerwacja",
+        "empty": "Brak nadchodzących rezerwacji."
+      },
+      "reminders": {
+        "title": "Przypomnienia",
+        "empty": "Brak przypomnień (zdrowie, prace domowe)."
+      },
+      "shortcuts": {
+        "title": "Skróty",
+        "empty": "Szybkie akcje pojawią się tutaj."
+      },
+      "events": {
+        "title": "Obserwowane wydarzenia",
+        "empty": "Nie obserwujesz jeszcze wydarzeń."
+      }
+    }
+  }
+}

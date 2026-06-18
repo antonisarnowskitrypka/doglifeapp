@@ -1,0 +1,16 @@
+{
+  "validation": {
+    "name": {
+      "required": "Podaj imię"
+    },
+    "email": {
+      "required": "Podaj e-mail"
+    },
+    "password": {
+      "required": "Podaj hasło",
+      "min": "Hasło min. 6 znaków",
+      "currentRequired": "Podaj obecne hasło",
+      "mismatch": "Hasła nie są takie same"
+    }
+  }
+}

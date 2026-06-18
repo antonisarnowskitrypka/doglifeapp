@@ -19,8 +19,8 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
-  const membershipId = getRouterParam(event, 'membershipId')
+  const orgId = getRequiredParam(event, 'orgId')
+  const membershipId = getRequiredParam(event, 'membershipId')
   await requireOrgRole(event, orgId, ['owner'])
 
   const db = adminDb()
@@ -28,10 +28,10 @@ export default defineEventHandler(async (event) => {
   const snap = await ref.get()
 
   if (!snap.exists || snap.get('organizationId') !== orgId) {
-    throw createError({ statusCode: 404, statusMessage: 'Nie znaleziono członka zespołu.' })
+    throw apiError(404, 'errors.api.staff.notFound')
   }
   if (snap.get('role') === 'owner') {
-    throw createError({ statusCode: 409, statusMessage: 'Nie można usunąć właściciela.' })
+    throw apiError(409, 'errors.api.staff.cannotRemoveOwner')
   }
 
   await ref.delete()

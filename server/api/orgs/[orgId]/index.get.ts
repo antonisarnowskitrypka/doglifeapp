@@ -35,14 +35,14 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
+  const orgId = getRequiredParam(event, 'orgId')
   await requireOrgRole(event, orgId, ['owner', 'staff'])
 
   const snap = await adminDb().collection('organizations').doc(orgId).get()
   if (!snap.exists) {
-    throw createError({ statusCode: 404, statusMessage: 'Nie znaleziono firmy.' })
+    throw apiError(404, 'errors.api.org.notFound')
   }
-  const d = snap.data()
+  const d = snap.data()!
   return {
     id: snap.id,
     name: d.name ?? '',

@@ -1,5 +1,6 @@
 <script setup>
 const ctx = useContextStore()
+const { t } = useI18n()
 const { mobileItems, desktopGroups } = useNavigation()
 const { items: breadcrumb } = useBreadcrumb()
 const { user, signOut } = useAuth()
@@ -38,11 +39,11 @@ const isProvider = computed(() => ctx.activeContext.type === 'org')
 const contextAvatar = computed(() =>
   (isProvider.value ? ctx.activeContext.membership?.avatarUrl : null) || ctx.user?.avatarUrl || undefined
 )
-const displayName = computed(() => ctx.user?.displayName || user.value?.displayName || 'Konto')
+const displayName = computed(() => ctx.user?.displayName || user.value?.displayName || t('common.labels.account'))
 const companyName = computed(() => (isProvider.value ? ctx.activeContext.membership?.organizationName : ''))
 const roleChip = computed(() => {
-  if (!isProvider.value) return 'OPIEKUN'
-  return ctx.activeContext.membership?.role === 'owner' ? 'WŁAŚCICIEL' : 'PRACOWNIK'
+  if (!isProvider.value) return t('common.roles.opiekun')
+  return ctx.activeContext.membership?.role === 'owner' ? t('common.roles.owner') : t('common.roles.staff')
 })
 
 // Map active state per item; recurse into submenu children (parents have no `to`).
@@ -56,8 +57,8 @@ const desktopItems = computed(() => desktopGroups.value.map(group => withActive(
 
 const userMenuItems = computed(() => [
   [{ label: displayName.value, type: 'label' }],
-  [{ label: 'Ustawienia konta', icon: 'i-lucide-settings', to: '/settings' }],
-  [{ label: 'Wyloguj', icon: 'i-lucide-log-out', color: 'error', onSelect: onSignOut }]
+  [{ label: t('account.menu.settings'), icon: 'i-lucide-settings', to: '/settings' }],
+  [{ label: t('auth.actions.signOut'), icon: 'i-lucide-log-out', color: 'error', onSelect: onSignOut }]
 ])
 
 function goBack() {
@@ -123,13 +124,13 @@ async function onSignOut() {
         class="grid gap-2"
       >
         <UButton
-          label="Załóż konto"
+          :label="$t('auth.actions.signup')"
           color="primary"
           block
           @click="openSignup"
         />
         <UButton
-          label="Zaloguj się"
+          :label="$t('auth.actions.login')"
           color="neutral"
           variant="subtle"
           block
@@ -199,7 +200,7 @@ async function onSignOut() {
             to="/"
             class="font-bold text-lg text-highlighted"
           >
-            DogLife
+            {{ $t('common.appName') }}
           </NuxtLink>
         </template>
 
@@ -212,7 +213,7 @@ async function onSignOut() {
             icon="i-lucide-arrow-left"
             color="neutral"
             variant="ghost"
-            aria-label="Wstecz"
+            :aria-label="$t('common.actions.back')"
             @click="goBack"
           />
           <span class="font-semibold truncate">{{ currentLabel }}</span>
@@ -224,7 +225,7 @@ async function onSignOut() {
             icon="i-lucide-bell"
             color="neutral"
             variant="ghost"
-            aria-label="Powiadomienia"
+            :aria-label="$t('nav.notifications')"
           />
           <UColorModeButton />
         </div>

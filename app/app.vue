@@ -11,8 +11,9 @@ useHead({
   }
 })
 
-const title = 'DogLife — opieka nad zwierzakiem'
-const description = 'Marketplace usług dla psów i kotów: trening, fizjoterapia, grooming, dietetyka i więcej. Rezerwuj zaufanych specjalistów w jednym miejscu.'
+const { t } = useI18n()
+const title = t('common.seo.title')
+const description = t('common.seo.description')
 
 useSeoMeta({
   title,

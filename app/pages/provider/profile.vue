@@ -1,10 +1,12 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Profil firmy — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.profile.metaTitle') })
 
 const ctx = useContextStore()
 const authFetch = useAuthFetch()
 const toast = useToast()
+const { apiErrorMessage } = useApiError()
 
 const orgId = computed(() => ctx.activeContext.membership?.organizationId)
 const isOwner = computed(() => ctx.activeContext.membership?.role === 'owner')
@@ -31,7 +33,7 @@ async function loadOrg() {
     form.company.taxId = o.companyDetails?.taxId || ''
     form.company.address = o.companyDetails?.address || ''
   } catch (e) {
-    toast.add({ title: e?.statusMessage || 'Nie udało się wczytać firmy.', color: 'error' })
+    toast.add({ title: apiErrorMessage(e, 'provider.profile.loadError'), color: 'error' })
   } finally {
     loading.value = false
   }
@@ -58,9 +60,9 @@ async function save() {
       }
     })
     await ctx.load(true)
-    toast.add({ title: 'Zapisano profil firmy.', color: 'success' })
+    toast.add({ title: t('provider.profile.saved'), color: 'success' })
   } catch (e) {
-    toast.add({ title: e?.statusMessage || 'Nie udało się zapisać.', color: 'error' })
+    toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -70,7 +72,7 @@ async function save() {
 <template>
   <UContainer class="py-8 max-w-2xl space-y-6">
     <h1 class="text-2xl font-bold text-highlighted">
-      Profil firmy
+      {{ $t('provider.profile.title') }}
     </h1>
 
     <UAlert
@@ -78,15 +80,15 @@ async function save() {
       color="info"
       variant="subtle"
       icon="i-lucide-info"
-      title="Tylko właściciel edytuje profil firmy"
-      description="Swój profil pracownika ustawisz w sekcji „Mój profil w firmie”."
+      :title="$t('provider.profile.notOwnerTitle')"
+      :description="$t('provider.profile.notOwnerDescription')"
     />
 
     <template v-else>
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Dane firmy
+            {{ $t('provider.profile.companyHeading') }}
           </h2>
         </template>
         <div class="space-y-5">
@@ -98,7 +100,7 @@ async function save() {
             @uploaded="ctx.load(true)"
           />
 
-          <UFormField label="Nazwa firmy">
+          <UFormField :label="$t('provider.profile.name')">
             <UInput
               v-model="form.name"
               class="w-full"
@@ -106,8 +108,8 @@ async function save() {
           </UFormField>
 
           <UFormField
-            label="Opis"
-            hint="widoczny na profilu publicznym"
+            :label="$t('provider.profile.description')"
+            :hint="$t('provider.profile.descriptionHint')"
           >
             <UTextarea
               v-model="form.description"
@@ -117,7 +119,7 @@ async function save() {
             />
           </UFormField>
 
-          <UFormField label="Kategorie usług">
+          <UFormField :label="$t('provider.profile.categories')">
             <USelectMenu
               v-model="form.categoryKeys"
               :items="categoryItems"
@@ -127,7 +129,7 @@ async function save() {
             />
           </UFormField>
 
-          <UFormField label="Obsługiwane gatunki">
+          <UFormField :label="$t('provider.profile.species')">
             <UCheckboxGroup
               v-model="form.acceptedSpecies"
               :items="speciesItems"
@@ -141,24 +143,24 @@ async function save() {
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Dane do faktury
+            {{ $t('provider.profile.invoiceHeading') }}
           </h2>
         </template>
         <div class="space-y-4">
-          <UFormField label="Nazwa (na fakturze)">
+          <UFormField :label="$t('provider.profile.invoiceName')">
             <UInput
               v-model="form.company.name"
               class="w-full"
             />
           </UFormField>
           <div class="grid gap-4 sm:grid-cols-2">
-            <UFormField label="NIP">
+            <UFormField :label="$t('provider.profile.taxId')">
               <UInput
                 v-model="form.company.taxId"
                 class="w-full"
               />
             </UFormField>
-            <UFormField label="Adres">
+            <UFormField :label="$t('provider.profile.address')">
               <UInput
                 v-model="form.company.address"
                 class="w-full"
@@ -170,7 +172,7 @@ async function save() {
 
       <div class="flex justify-end">
         <UButton
-          label="Zapisz"
+          :label="$t('common.actions.save')"
           color="primary"
           icon="i-lucide-check"
           :loading="saving"

@@ -1,12 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'shared' })
-useHead({ title: 'Powiadomienia — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('appSettings.notifications.metaTitle') })
 </script>
 
 <template>
   <AppPagePlaceholder
-    title="Powiadomienia"
+    :title="$t('appSettings.notifications.title')"
     icon="i-lucide-bell-ring"
-    description="Wybierz, o czym i jak chcesz dostawać powiadomienia. Wkrótce."
+    :description="$t('appSettings.notifications.placeholder')"
   />
 </template>

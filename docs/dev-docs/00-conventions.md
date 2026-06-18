@@ -78,3 +78,42 @@ longDescription: string | null  // revealed via "show more" (exact UI TBD in UI 
 ## Server Authority
 
 - Clients never write business data directly to Firestore. All mutations go through Nuxt server routes with the Admin SDK (see [Architecture](./01-architecture.md), [Firebase & Security](./03-firebase-and-security.md)).
+
+## i18n
+
+**Never hardcode user-facing text.** Every string a user can read goes through an i18n key — labels, placeholders, hints, headings, button text, toast/alert titles & descriptions, validation messages, `useHead`/SEO titles, `aria-label`s, and Polish defaults in `defineProps`. (Only `pl` is populated for now; `en`/`bg` fall back to `pl` via `i18n/i18n.config.ts`.)
+
+### Catalog layout — file name == top-level key
+
+One JSON file per namespace under `i18n/locales/<locale>/<namespace>.json`, registered in `nuxt.config.ts` (`i18n.locales[].files`). Each file's single top-level key **is** the namespace, so the key prefix tells you the file:
+
+```
+i18n/locales/pl/
+  common.json       common.*       actions (save/cancel/…), labels, roles, locales, uploader, seo, generic toasts
+  validation.json   validation.*   form validation messages
+  errors.json       errors.*       Firebase Auth error map + generic fallbacks
+  nav.json          nav.*          sidebar / bottom nav / breadcrumb labels (single source for route labels)
+  auth.json         auth.*         login/signup/reset modal, social, email-verify banner, teaser
+  account.json      account.*      /settings: profile, invoice, password, delete
+  appSettings.json  appSettings.*  notifications / language / appearance
+  provider.json     provider.*     provider pages + settings hub + staff form
+  onboarding.json / home.json / opiekun.json   onboarding, opiekun home, opiekun placeholder pages
+```
+
+### Key naming & usage
+
+- Keys are `namespace.section.element` in **camelCase** (e.g. `auth.login.title`, `provider.staff.inviteButton`, `account.delete.confirmBody1`).
+- Named interpolation only: `"body": "Wysłaliśmy link na {email}."` → `t('auth.verify.body', { email })`.
+- Templates: `$t('key')`. Script/composables: `const { t } = useI18n()` then `t('key')`. Building reactive arrays (nav items, select options) — wrap in `computed(() => …t())` so labels react to locale.
+- **Reuse before adding.** Check `common`, `validation`, `errors`, `nav` first; only create a domain key when nothing generic fits. A generic string used in 2+ namespaces belongs in `common` (e.g. `common.toast.saveError`). Same text in different *meanings* may legitimately be separate keys (they can diverge in translation).
+- Firebase Auth errors (client) map through the `useAuthError()` composable (code → `errors.auth.*` key), not inline.
+
+### Server-side errors
+
+The server has no vue-i18n, so routes **return a key, not text**. Throw with the `apiError()` util (`server/utils/apiError.ts`):
+
+```ts
+throw apiError(409, 'errors.api.staff.alreadyMember')   // statusMessage = the key; data.i18nKey carries it
+```
+
+Messages live under `errors.api.<domain>.<element>` in `errors.json`. The client resolves them with `useApiError().apiErrorMessage(e, fallbackKey)` — it reads `error.data.i18nKey`, translates it, and falls back to `fallbackKey` (a local key) then `errors.generic`. Use `apiErrorMessage` in every catch that handles a `$fetch`/server error (use `authErrorMessage` for Firebase client errors). Purely technical guards that never reach the UI (401 `Missing auth token`, 404 `User profile not found`) stay as short English `createError`.

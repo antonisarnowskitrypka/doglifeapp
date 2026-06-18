@@ -2,6 +2,8 @@
 // Nudges email/password users to confirm their address. Social logins (Google/Apple)
 // arrive pre-verified, so they never see this. Shown app-wide via layouts/app.vue.
 const { user, sendVerification } = useAuth()
+const { authErrorMessage } = useAuthError()
+const { t } = useI18n()
 const toast = useToast()
 
 const sending = ref(false)
@@ -16,7 +18,7 @@ async function resend() {
   sending.value = true
   try {
     await sendVerification()
-    toast.add({ title: 'Wysłaliśmy link weryfikacyjny.', description: `Sprawdź skrzynkę: ${user.value?.email}`, color: 'success' })
+    toast.add({ title: t('auth.verify.sentTitle'), description: t('auth.verify.sentBody', { email: user.value?.email }), color: 'success' })
   } catch (e) {
     toast.add({ title: authErrorMessage(e), color: 'error' })
   } finally {
@@ -30,9 +32,9 @@ async function recheck() {
     await user.value?.reload()
     if (user.value?.emailVerified) {
       verifiedLocally.value = true
-      toast.add({ title: 'E-mail potwierdzony. Dziękujemy!', color: 'success', icon: 'i-lucide-mail-check' })
+      toast.add({ title: t('auth.verify.confirmedTitle'), color: 'success', icon: 'i-lucide-mail-check' })
     } else {
-      toast.add({ title: 'Jeszcze nie widzimy potwierdzenia.', description: 'Kliknij link w mailu, a potem spróbuj ponownie.', color: 'warning' })
+      toast.add({ title: t('auth.verify.notYetTitle'), description: t('auth.verify.notYetBody'), color: 'warning' })
     }
   } finally {
     checking.value = false
@@ -46,12 +48,12 @@ async function recheck() {
     color="warning"
     variant="subtle"
     icon="i-lucide-mail-warning"
-    title="Potwierdź swój adres e-mail"
-    :description="`Wysłaliśmy link na ${user?.email}. Potwierdź adres, aby w pełni zabezpieczyć konto.`"
+    :title="t('auth.verify.title')"
+    :description="t('auth.verify.body', { email: user?.email })"
     class="m-4 mb-0"
     :actions="[
-      { label: 'Wyślij ponownie', color: 'warning', variant: 'soft', loading: sending, onClick: resend },
-      { label: 'Już potwierdziłem', color: 'neutral', variant: 'ghost', loading: checking, onClick: recheck }
+      { label: t('auth.verify.resend'), color: 'warning', variant: 'soft', loading: sending, onClick: resend },
+      { label: t('auth.verify.recheck'), color: 'neutral', variant: 'ghost', loading: checking, onClick: recheck }
     ]"
   />
 </template>

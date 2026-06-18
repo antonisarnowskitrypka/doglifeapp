@@ -66,13 +66,37 @@ export default defineNuxtConfig({
   // Launch locales (notifications/UI): pl (primary market), en, bg. Using `no_prefix`
   // for now to avoid routing churn before translations exist; switch to a prefixed
   // strategy for localized SEO once locale content lands.
+  //
+  // Message catalog: one JSON file per namespace under i18n/locales/<locale>/ (file name ==
+  // top-level key). See dev-docs/00-conventions.md#i18n. Only `pl` is populated for now;
+  // en/bg fall back to pl (i18n.config.ts) until translated.
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'pl',
+    vueI18n: 'i18n.config.ts',
+    langDir: 'locales',
     locales: [
-      { code: 'pl', language: 'pl-PL', name: 'Polski' },
-      { code: 'en', language: 'en-US', name: 'English' },
-      { code: 'bg', language: 'bg-BG', name: 'Български' }
+      {
+        code: 'pl',
+        language: 'pl-PL',
+        name: 'Polski',
+        files: [
+          'pl/common.json',
+          'pl/validation.json',
+          'pl/errors.json',
+          'pl/nav.json',
+          'pl/auth.json',
+          'pl/account.json',
+          'pl/appSettings.json',
+          'pl/provider.json',
+          'pl/onboarding.json',
+          'pl/home.json',
+          'pl/opiekun.json'
+        ]
+      },
+      // en/bg not translated yet — empty catalogs; they fall back to pl (i18n.config.ts).
+      { code: 'en', language: 'en-US', name: 'English', files: ['en/_placeholder.json'] },
+      { code: 'bg', language: 'bg-BG', name: 'Български', files: ['bg/_placeholder.json'] }
     ]
   },
 

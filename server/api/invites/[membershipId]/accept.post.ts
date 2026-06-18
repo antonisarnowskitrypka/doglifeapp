@@ -32,17 +32,17 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const decoded = await requireUser(event)
-  const membershipId = getRouterParam(event, 'membershipId')
+  const membershipId = getRequiredParam(event, 'membershipId')
 
   const db = adminDb()
   const ref = db.collection('organizationMembers').doc(membershipId)
   const snap = await ref.get()
 
   if (!snap.exists || snap.get('status') !== 'invited') {
-    throw createError({ statusCode: 404, statusMessage: 'Zaproszenie nie istnieje lub zostało już rozpatrzone.' })
+    throw apiError(404, 'errors.api.invite.notFound')
   }
   if (snap.get('userId') !== decoded.uid) {
-    throw createError({ statusCode: 403, statusMessage: 'To zaproszenie nie jest skierowane do Ciebie.' })
+    throw apiError(403, 'errors.api.invite.notYours')
   }
 
   await ref.update({ status: 'active', acceptedAt: FieldValue.serverTimestamp() })

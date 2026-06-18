@@ -1,8 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'opiekun' })
-useHead({ title: 'Zwierzaki — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('opiekun.pets.metaTitle') })
 </script>
 
 <template>
-  <AppPagePlaceholder title="Życie zwierzaka" icon="i-lucide-paw-print" description="Lista zwierzaków, profil i Życie zwierzaka (Faza C/F planu UI)." />
+  <AppPagePlaceholder
+    :title="$t('opiekun.pets.title')"
+    icon="i-lucide-paw-print"
+    :description="$t('opiekun.pets.description')"
+  />
 </template>

@@ -1,9 +1,11 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'shared' })
-useHead({ title: 'Załóż firmę — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('onboarding.meta.title') })
 
 const ctx = useContextStore()
 const authFetch = useAuthFetch()
+const { apiErrorMessage } = useApiError()
 
 const categoryItems = SERVICE_CATEGORIES.map(c => ({ label: c.label, value: c.key, icon: c.icon }))
 const speciesItems = SPECIES.map(s => ({ label: s.label, value: s.key }))
@@ -18,9 +20,9 @@ const formError = ref('')
 
 function validate(s) {
   const errors = []
-  if (!s.name || s.name.trim().length < 2) errors.push({ name: 'name', message: 'Podaj nazwę (min. 2 znaki)' })
-  if (!s.categoryKeys.length) errors.push({ name: 'categoryKeys', message: 'Wybierz min. jedną kategorię' })
-  if (!s.acceptedSpecies.length) errors.push({ name: 'acceptedSpecies', message: 'Zaznacz min. jeden gatunek' })
+  if (!s.name || s.name.trim().length < 2) errors.push({ name: 'name', message: t('onboarding.validation.name') })
+  if (!s.categoryKeys.length) errors.push({ name: 'categoryKeys', message: t('onboarding.validation.categories') })
+  if (!s.acceptedSpecies.length) errors.push({ name: 'acceptedSpecies', message: t('onboarding.validation.species') })
   return errors
 }
 
@@ -33,7 +35,7 @@ async function onSubmit() {
     ctx.setContext(res.membershipId) // switch into the freshly created org
     await navigateTo('/provider')
   } catch (e) {
-    formError.value = e?.statusMessage || e?.data?.statusMessage || 'Nie udało się założyć firmy.'
+    formError.value = apiErrorMessage(e, 'onboarding.error')
   } finally {
     loading.value = false
   }
@@ -44,11 +46,10 @@ async function onSubmit() {
   <UContainer class="py-8 max-w-xl space-y-6">
     <div class="space-y-1">
       <h1 class="text-2xl font-bold text-highlighted">
-        Załóż firmę
+        {{ $t('onboarding.title') }}
       </h1>
       <p class="text-muted text-sm">
-        Utworzymy firmę jako wersję roboczą. Resztę (lokalizacje, usługi, grafik, płatności)
-        uzupełnisz później przed publikacją.
+        {{ $t('onboarding.subtitle') }}
       </p>
     </div>
 
@@ -59,35 +60,35 @@ async function onSubmit() {
       @submit="onSubmit"
     >
       <UFormField
-        label="Nazwa firmy"
+        :label="$t('onboarding.fields.name')"
         name="name"
         required
       >
         <UInput
           v-model="state.name"
-          placeholder="np. Akademia Psa Burek"
+          :placeholder="$t('onboarding.fields.namePlaceholder')"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        label="Kategorie usług"
+        :label="$t('onboarding.fields.categories')"
         name="categoryKeys"
         required
-        hint="możesz wybrać kilka"
+        :hint="$t('onboarding.fields.categoriesHint')"
       >
         <USelectMenu
           v-model="state.categoryKeys"
           :items="categoryItems"
           value-key="value"
           multiple
-          placeholder="Wybierz kategorie"
+          :placeholder="$t('onboarding.fields.categoriesPlaceholder')"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        label="Obsługiwane gatunki"
+        :label="$t('onboarding.fields.species')"
         name="acceptedSpecies"
         required
       >
@@ -110,12 +111,12 @@ async function onSubmit() {
       <div class="flex items-center gap-2">
         <UButton
           type="submit"
-          label="Załóż firmę"
+          :label="$t('onboarding.submit')"
           color="primary"
           :loading="loading"
         />
         <UButton
-          label="Anuluj"
+          :label="$t('common.actions.cancel')"
           color="neutral"
           variant="ghost"
           to="/"

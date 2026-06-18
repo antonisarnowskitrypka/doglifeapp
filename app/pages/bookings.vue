@@ -1,8 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'opiekun' })
-useHead({ title: 'Rezerwacje — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('opiekun.bookings.metaTitle') })
 </script>
 
 <template>
-  <AppPagePlaceholder title="Moje rezerwacje" icon="i-lucide-calendar-check" description="Lista i szczegóły rezerwacji opiekuna (Faza C/D planu UI)." />
+  <AppPagePlaceholder
+    :title="$t('opiekun.bookings.title')"
+    icon="i-lucide-calendar-check"
+    :description="$t('opiekun.bookings.description')"
+  />
 </template>

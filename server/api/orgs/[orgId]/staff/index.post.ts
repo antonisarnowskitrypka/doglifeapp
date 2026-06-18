@@ -44,13 +44,13 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
+  const orgId = getRequiredParam(event, 'orgId')
   await requireOrgRole(event, orgId, ['owner'])
 
   const body = await readBody<{ email?: string }>(event)
   const email = (body.email || '').trim().toLowerCase()
   if (!email || !email.includes('@')) {
-    throw createError({ statusCode: 400, statusMessage: 'Podaj prawidłowy adres e-mail.' })
+    throw apiError(400, 'errors.api.staff.invalidEmail')
   }
 
   const db = adminDb()
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
   try {
     userId = (await adminAuth().getUserByEmail(email)).uid
   } catch {
-    userId = null // no account yet → pending invite
+    // no account yet → pending invite (userId stays null)
   }
 
   // Guard against duplicates (active/invited/pending) for this org.
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
     members.where('organizationId', '==', orgId).where('invitedEmail', '==', email).limit(1).get()
   ])
   if (!byUser.empty || !byEmail.empty) {
-    throw createError({ statusCode: 409, statusMessage: 'Ta osoba jest już w zespole lub ma zaproszenie.' })
+    throw apiError(409, 'errors.api.staff.alreadyMember')
   }
 
   const status = userId ? 'invited' : 'pending'

@@ -2,12 +2,10 @@
 // Temporary placeholder shown on login-required pages when the user is anonymous —
 // instead of forcing the auth modal open. TODO: replace with an illustration + marketing
 // copy encouraging sign-up (per product direction).
+const { t } = useI18n()
 defineProps({
-  title: { type: String, default: 'Załóż konto, aby zobaczyć więcej' },
-  description: {
-    type: String,
-    default: 'Ta sekcja jest dostępna po zalogowaniu. Załóż konto, aby rezerwować usługi i zarządzać zwierzakami.'
-  }
+  title: { type: String, default: () => '' },
+  description: { type: String, default: () => '' }
 })
 
 const { openSignup, openLogin } = useAuthModal()
@@ -24,20 +22,20 @@ const { openSignup, openLogin } = useAuthModal()
       </div>
       <div class="space-y-1">
         <h1 class="text-xl font-bold text-highlighted">
-          {{ title }}
+          {{ title || t('auth.teaser.title') }}
         </h1>
         <p class="text-muted text-sm">
-          {{ description }}
+          {{ description || t('auth.teaser.description') }}
         </p>
       </div>
       <div class="flex flex-wrap justify-center gap-2">
         <UButton
-          label="Załóż konto"
+          :label="$t('auth.actions.signup')"
           color="primary"
           @click="openSignup"
         />
         <UButton
-          label="Zaloguj się"
+          :label="$t('auth.actions.login')"
           color="neutral"
           variant="subtle"
           @click="openLogin"

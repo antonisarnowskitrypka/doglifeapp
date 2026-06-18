@@ -1,12 +1,14 @@
 <script setup>
 const { state, close } = useAuthModal()
 const { signInWithEmail, registerWithEmail, sendPasswordReset } = useAuth()
+const { authErrorMessage } = useAuthError()
+const { t } = useI18n()
 const ctx = useContextStore()
 
-const tabItems = [
-  { label: 'Logowanie', value: 'login', slot: 'login' },
-  { label: 'Rejestracja', value: 'signup', slot: 'signup' }
-]
+const tabItems = computed(() => [
+  { label: t('auth.tabs.login'), value: 'login', slot: 'login' },
+  { label: t('auth.tabs.signup'), value: 'signup', slot: 'signup' }
+])
 
 const login = reactive({ email: '', password: '' })
 const signup = reactive({ displayName: '', email: '', password: '' })
@@ -26,7 +28,7 @@ function toggleReset() {
 async function onReset() {
   reset.error = ''
   if (!reset.email) {
-    reset.error = 'Podaj adres e-mail'
+    reset.error = t('validation.email.required')
     return
   }
   reset.loading = true
@@ -57,16 +59,16 @@ async function onSuccess() {
 
 function validateLogin(s) {
   const e = []
-  if (!s.email) e.push({ name: 'email', message: 'Podaj e-mail' })
-  if (!s.password) e.push({ name: 'password', message: 'Podaj hasło' })
+  if (!s.email) e.push({ name: 'email', message: t('validation.email.required') })
+  if (!s.password) e.push({ name: 'password', message: t('validation.password.required') })
   return e
 }
 
 function validateSignup(s) {
   const e = []
-  if (!s.displayName) e.push({ name: 'displayName', message: 'Podaj imię' })
-  if (!s.email) e.push({ name: 'email', message: 'Podaj e-mail' })
-  if (!s.password || s.password.length < 6) e.push({ name: 'password', message: 'Hasło min. 6 znaków' })
+  if (!s.displayName) e.push({ name: 'displayName', message: t('validation.name.required') })
+  if (!s.email) e.push({ name: 'email', message: t('validation.email.required') })
+  if (!s.password || s.password.length < 6) e.push({ name: 'password', message: t('validation.password.min') })
   return e
 }
 
@@ -100,7 +102,7 @@ async function onSignup() {
 <template>
   <UModal
     v-model:open="state.open"
-    title="DogLife"
+    :title="$t('common.appName')"
     :ui="{ content: 'max-w-sm' }"
   >
     <template #content>
@@ -117,7 +119,7 @@ async function onSignup() {
                 @success="onSuccess"
                 @error="error = $event"
               />
-              <USeparator label="lub" />
+              <USeparator :label="$t('common.labels.or')" />
               <UForm
                 :state="login"
                 :validate="validateLogin"
@@ -125,26 +127,26 @@ async function onSignup() {
                 @submit="onLogin"
               >
                 <UFormField
-                  label="E-mail"
+                  :label="$t('auth.fields.email')"
                   name="email"
                 >
                   <UInput
                     v-model="login.email"
                     type="email"
                     autocomplete="email"
-                    placeholder="ty@przyklad.pl"
+                    :placeholder="$t('auth.fields.emailPlaceholder')"
                     class="w-full"
                   />
                 </UFormField>
                 <UFormField
-                  label="Hasło"
+                  :label="$t('auth.fields.password')"
                   name="password"
                 >
                   <UInput
                     v-model="login.password"
                     type="password"
                     autocomplete="current-password"
-                    placeholder="••••••••"
+                    :placeholder="$t('auth.fields.passwordPlaceholder')"
                     class="w-full"
                   />
                 </UFormField>
@@ -157,7 +159,7 @@ async function onSignup() {
                 />
                 <UButton
                   type="submit"
-                  label="Zaloguj się"
+                  :label="$t('auth.actions.login')"
                   color="primary"
                   block
                   :loading="loading"
@@ -170,7 +172,7 @@ async function onSignup() {
                   color="neutral"
                   size="sm"
                   class="px-0"
-                  :label="reset.open ? 'Ukryj' : 'Nie pamiętasz hasła?'"
+                  :label="reset.open ? $t('common.actions.hide') : $t('auth.reset.trigger')"
                   @click="toggleReset"
                 />
                 <div
@@ -182,24 +184,24 @@ async function onSignup() {
                     color="success"
                     variant="subtle"
                     icon="i-lucide-mail-check"
-                    title="Sprawdź skrzynkę"
-                    :description="`Jeśli istnieje konto dla ${reset.email}, wyślemy link do zresetowania hasła.`"
+                    :title="$t('auth.reset.sentTitle')"
+                    :description="$t('auth.reset.sentBody', { email: reset.email })"
                   />
                   <template v-else>
                     <UFormField
-                      label="E-mail"
+                      :label="$t('auth.fields.email')"
                       :error="reset.error"
                     >
                       <UInput
                         v-model="reset.email"
                         type="email"
                         autocomplete="email"
-                        placeholder="ty@przyklad.pl"
+                        :placeholder="$t('auth.fields.emailPlaceholder')"
                         class="w-full"
                       />
                     </UFormField>
                     <UButton
-                      label="Wyślij link resetu"
+                      :label="$t('auth.reset.submit')"
                       color="neutral"
                       block
                       :loading="reset.loading"
@@ -217,7 +219,7 @@ async function onSignup() {
                 @success="onSuccess"
                 @error="error = $event"
               />
-              <USeparator label="lub" />
+              <USeparator :label="$t('common.labels.or')" />
               <UForm
                 :state="signup"
                 :validate="validateSignup"
@@ -225,38 +227,38 @@ async function onSignup() {
                 @submit="onSignup"
               >
                 <UFormField
-                  label="Imię"
+                  :label="$t('auth.fields.name')"
                   name="displayName"
                 >
                   <UInput
                     v-model="signup.displayName"
                     autocomplete="name"
-                    placeholder="Jak się do Ciebie zwracać?"
+                    :placeholder="$t('auth.fields.namePlaceholder')"
                     class="w-full"
                   />
                 </UFormField>
                 <UFormField
-                  label="E-mail"
+                  :label="$t('auth.fields.email')"
                   name="email"
                 >
                   <UInput
                     v-model="signup.email"
                     type="email"
                     autocomplete="email"
-                    placeholder="ty@przyklad.pl"
+                    :placeholder="$t('auth.fields.emailPlaceholder')"
                     class="w-full"
                   />
                 </UFormField>
                 <UFormField
-                  label="Hasło"
+                  :label="$t('auth.fields.password')"
                   name="password"
-                  hint="min. 6 znaków"
+                  :hint="$t('auth.fields.passwordHint')"
                 >
                   <UInput
                     v-model="signup.password"
                     type="password"
                     autocomplete="new-password"
-                    placeholder="••••••••"
+                    :placeholder="$t('auth.fields.passwordPlaceholder')"
                     class="w-full"
                   />
                 </UFormField>
@@ -269,7 +271,7 @@ async function onSignup() {
                 />
                 <UButton
                   type="submit"
-                  label="Załóż konto"
+                  :label="$t('auth.actions.signup')"
                   color="primary"
                   block
                   :loading="loading"

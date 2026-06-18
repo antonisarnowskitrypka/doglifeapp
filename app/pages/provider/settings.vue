@@ -1,35 +1,36 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Ustawienia firmy — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.settingsHub.metaTitle') })
 
 // Provider "Więcej" hub (mobile) — mirrors the desktop side-rail submenus.
 // `ready: false` shows a "wkrótce" badge; the target page is a placeholder either way.
-const sections = [
+const sections = computed(() => [
   {
-    title: 'Moja wizytówka',
+    title: t('nav.myCard.title'),
     links: [
-      { label: 'Mój profil firmowy', description: 'Twój opis, języki, zdjęcie', icon: 'i-lucide-id-card', to: '/provider/me', ready: true },
-      { label: 'Moje opinie', description: 'Opinie wystawione Tobie', icon: 'i-lucide-star', to: '/provider/reviews', ready: false }
+      { label: t('nav.myCard.profile'), description: t('provider.settingsHub.meProfileDescription'), icon: 'i-lucide-id-card', to: '/provider/me', ready: true },
+      { label: t('nav.myCard.reviews'), description: t('provider.settingsHub.reviewsDescription'), icon: 'i-lucide-star', to: '/provider/reviews', ready: false }
     ]
   },
   {
-    title: 'Ustawienia firmy',
+    title: t('nav.companySettings.title'),
     links: [
-      { label: 'Profil firmy', description: 'Nazwa, opis, logo, dane do faktury', icon: 'i-lucide-store', to: '/provider/profile', ready: true },
-      { label: 'Zespół', description: 'Pracownicy i zaproszenia', icon: 'i-lucide-users', to: '/provider/staff', ready: true },
-      { label: 'Usługi', description: 'Oferta, tryby, ceny', icon: 'i-lucide-list', to: '/provider/services', ready: false },
-      { label: 'Lokalizacje i godziny', description: 'Adresy, strefa czasowa, grafik', icon: 'i-lucide-map-pin', to: '/provider/locations', ready: false }
+      { label: t('nav.companySettings.profile'), description: t('provider.settingsHub.companyProfileDescription'), icon: 'i-lucide-store', to: '/provider/profile', ready: true },
+      { label: t('nav.companySettings.staff'), description: t('provider.settingsHub.staffDescription'), icon: 'i-lucide-users', to: '/provider/staff', ready: true },
+      { label: t('nav.companySettings.services'), description: t('provider.settingsHub.servicesDescription'), icon: 'i-lucide-list', to: '/provider/services', ready: false },
+      { label: t('nav.companySettings.locations'), description: t('provider.settingsHub.locationsDescription'), icon: 'i-lucide-map-pin', to: '/provider/locations', ready: false }
     ]
   },
   {
-    title: 'Ustawienia aplikacji',
+    title: t('nav.appSettings.title'),
     links: [
-      { label: 'Powiadomienia', description: 'Co i jak Cię informujemy', icon: 'i-lucide-bell-ring', to: '/app-settings/notifications', ready: false },
-      { label: 'Język aplikacji', description: 'Język interfejsu', icon: 'i-lucide-languages', to: '/app-settings/language', ready: false },
-      { label: 'Wygląd', description: 'Motyw jasny / ciemny', icon: 'i-lucide-sun-moon', to: '/app-settings/appearance', ready: true }
+      { label: t('nav.appSettings.notifications'), description: t('provider.settingsHub.notificationsDescription'), icon: 'i-lucide-bell-ring', to: '/app-settings/notifications', ready: false },
+      { label: t('nav.appSettings.language'), description: t('provider.settingsHub.languageDescription'), icon: 'i-lucide-languages', to: '/app-settings/language', ready: false },
+      { label: t('nav.appSettings.appearance'), description: t('provider.settingsHub.appearanceDescription'), icon: 'i-lucide-sun-moon', to: '/app-settings/appearance', ready: true }
     ]
   }
-]
+])
 </script>
 
 <template>
@@ -65,7 +66,7 @@ const sections = [
               {{ link.label }}
               <UBadge
                 v-if="!link.ready"
-                label="wkrótce"
+                :label="$t('common.labels.soon')"
                 color="neutral"
                 variant="subtle"
                 size="sm"

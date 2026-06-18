@@ -22,10 +22,10 @@ export async function uploadImage(opts: { buffer: Buffer, contentType: string, p
   const { buffer, contentType, pathBase } = opts
 
   if (!ALLOWED_TYPES.has(contentType)) {
-    throw createError({ statusCode: 400, statusMessage: 'Niedozwolony typ pliku (dozwolone: JPG, PNG, WEBP, HEIC).' })
+    throw apiError(400, 'errors.api.upload.invalidType')
   }
   if (buffer.length > MAX_BYTES) {
-    throw createError({ statusCode: 413, statusMessage: 'Plik za duży (maks. 10 MB).' })
+    throw apiError(413, 'errors.api.upload.tooLarge')
   }
 
   const path = `${pathBase}.${EXT[contentType]}`
@@ -52,7 +52,7 @@ export async function readUploadedImage(event: Parameters<typeof readMultipartFo
   const parts = await readMultipartFormData(event)
   const file = parts?.find(p => p.filename && p.data?.length)
   if (!file) {
-    throw createError({ statusCode: 400, statusMessage: 'Brak pliku.' })
+    throw apiError(400, 'errors.api.upload.noFile')
   }
   return { buffer: file.data as Buffer, contentType: file.type || 'application/octet-stream' }
 }

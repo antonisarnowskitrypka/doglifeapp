@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "DogLife",
+    "toast": {
+      "saveError": "Nie udało się zapisać."
+    },
+    "actions": {
+      "save": "Zapisz",
+      "cancel": "Anuluj",
+      "delete": "Usuń",
+      "back": "Wstecz",
+      "close": "Zamknij",
+      "retry": "Spróbuj ponownie",
+      "send": "Wyślij",
+      "confirm": "Potwierdź",
+      "hide": "Ukryj"
+    },
+    "labels": {
+      "optional": "opcjonalne",
+      "or": "lub",
+      "soon": "wkrótce",
+      "account": "Konto"
+    },
+    "roles": {
+      "opiekun": "OPIEKUN",
+      "owner": "WŁAŚCICIEL",
+      "staff": "PRACOWNIK"
+    },
+    "context": {
+      "opiekun": "Opiekun"
+    },
+    "locales": {
+      "pl": "Polski",
+      "en": "English",
+      "bg": "Български"
+    },
+    "placeholder": {
+      "title": "Ekran w budowie",
+      "description": "Ten widok zdefiniujemy zgodnie z planem UI (ui-docs)."
+    },
+    "uploader": {
+      "change": "Zmień zdjęcie",
+      "add": "Dodaj zdjęcie",
+      "hint": "JPG / PNG / WEBP / HEIC, do 10 MB.",
+      "saved": "Zapisano zdjęcie.",
+      "error": "Nie udało się wgrać zdjęcia."
+    },
+    "seo": {
+      "title": "DogLife — opieka nad zwierzakiem",
+      "description": "Marketplace usług dla psów i kotów: trening, fizjoterapia, grooming, dietetyka i więcej. Rezerwuj zaufanych specjalistów w jednym miejscu."
+    }
+  }
+}

@@ -1,12 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Lokalizacje i godziny — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.locations.metaTitle') })
 </script>
 
 <template>
   <AppPagePlaceholder
-    title="Lokalizacje i godziny"
+    :title="$t('provider.locations.placeholderTitle')"
     icon="i-lucide-map-pin"
-    description="Adresy, strefa czasowa i grafik pracy firmy. Wkrótce."
+    :description="$t('provider.locations.placeholderDescription')"
   />
 </template>

@@ -1,9 +1,12 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'public' })
-useHead({ title: 'Ustawienia — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('account.meta.title') })
 
 const ctx = useContextStore()
 const { user, changePassword, requestAccountDeletion } = useAuth()
+const { authErrorMessage } = useAuthError()
+const { apiErrorMessage } = useApiError()
 const { openLogin } = useAuthModal()
 const authFetch = useAuthFetch()
 const toast = useToast()
@@ -16,16 +19,16 @@ const socialProviders = computed(() =>
   (user.value?.providerData || [])
     .map(p => PROVIDER_LABELS[p.providerId])
     .filter(Boolean)
-    .join(' / ') || 'zewnętrznego dostawcę'
+    .join(' / ') || t('account.password.socialFallback')
 )
 
 const pw = reactive({ current: '', next: '', confirm: '' })
 const pwSaving = ref(false)
 function validatePw() {
   const e = []
-  if (!pw.current) e.push({ name: 'current', message: 'Podaj obecne hasło' })
-  if (!pw.next || pw.next.length < 6) e.push({ name: 'next', message: 'Hasło min. 6 znaków' })
-  if (pw.confirm !== pw.next) e.push({ name: 'confirm', message: 'Hasła nie są takie same' })
+  if (!pw.current) e.push({ name: 'current', message: t('validation.password.currentRequired') })
+  if (!pw.next || pw.next.length < 6) e.push({ name: 'next', message: t('validation.password.min') })
+  if (pw.confirm !== pw.next) e.push({ name: 'confirm', message: t('validation.password.mismatch') })
   return e
 }
 async function onChangePassword() {
@@ -33,7 +36,7 @@ async function onChangePassword() {
   try {
     await changePassword(pw.current, pw.next)
     pw.current = pw.next = pw.confirm = ''
-    toast.add({ title: 'Hasło zostało zmienione.', color: 'success', icon: 'i-lucide-check' })
+    toast.add({ title: t('account.password.changed'), color: 'success', icon: 'i-lucide-check' })
   } catch (e) {
     toast.add({ title: authErrorMessage(e), color: 'error' })
   } finally {
@@ -51,24 +54,24 @@ async function onDeleteAccount() {
     ctx.reset()
     deleteOpen.value = false
     toast.add({
-      title: 'Zaplanowano usunięcie konta.',
-      description: 'Konto zostanie usunięte za 7 dni. Zaloguj się ponownie w tym czasie, aby anulować.',
+      title: t('account.delete.scheduledTitle'),
+      description: t('account.delete.scheduledBody'),
       color: 'info',
       icon: 'i-lucide-clock'
     })
     await navigateTo('/')
   } catch (e) {
-    toast.add({ title: e?.statusMessage || authErrorMessage(e), color: 'error' })
+    toast.add({ title: apiErrorMessage(e), color: 'error' })
   } finally {
     deleting.value = false
   }
 }
 
-const localeItems = [
-  { label: 'Polski', value: 'pl' },
-  { label: 'English', value: 'en' },
-  { label: 'Български', value: 'bg' }
-]
+const localeItems = computed(() => [
+  { label: t('common.locales.pl'), value: 'pl' },
+  { label: t('common.locales.en'), value: 'en' },
+  { label: t('common.locales.bg'), value: 'bg' }
+])
 
 const form = reactive({ displayName: '', bio: '', phone: '', locale: 'pl', company: { name: '', taxId: '', address: '' } })
 const saving = ref(false)
@@ -105,9 +108,9 @@ async function save() {
       }
     })
     await ctx.load(true)
-    toast.add({ title: 'Zapisano zmiany.', color: 'success' })
+    toast.add({ title: t('account.profile.saved'), color: 'success' })
   } catch (e) {
-    toast.add({ title: e?.statusMessage || 'Nie udało się zapisać.', color: 'error' })
+    toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -124,7 +127,7 @@ async function save() {
     />
 
     <h1 class="text-2xl font-bold text-highlighted">
-      Ustawienia
+      {{ $t('account.title') }}
     </h1>
 
     <UAlert
@@ -132,15 +135,15 @@ async function save() {
       color="info"
       variant="subtle"
       icon="i-lucide-lock"
-      title="Zaloguj się, aby zarządzać kontem"
-      :actions="[{ label: 'Zaloguj się', color: 'primary', onClick: openLogin }]"
+      :title="$t('account.signinAlert.title')"
+      :actions="[{ label: $t('auth.actions.login'), color: 'primary', onClick: openLogin }]"
     />
 
     <template v-else>
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Profil
+            {{ $t('account.profile.title') }}
           </h2>
         </template>
 
@@ -152,7 +155,7 @@ async function save() {
             @uploaded="ctx.load(true)"
           />
 
-          <UFormField label="Imię / nazwa wyświetlana">
+          <UFormField :label="$t('account.profile.displayName')">
             <UInput
               v-model="form.displayName"
               class="w-full"
@@ -160,8 +163,8 @@ async function save() {
           </UFormField>
 
           <UFormField
-            label="O mnie"
-            hint="opcjonalne"
+            :label="$t('account.profile.bio')"
+            :hint="$t('common.labels.optional')"
           >
             <UTextarea
               v-model="form.bio"
@@ -173,8 +176,8 @@ async function save() {
 
           <div class="grid gap-4 sm:grid-cols-2">
             <UFormField
-              label="Telefon"
-              hint="opcjonalne"
+              :label="$t('account.profile.phone')"
+              :hint="$t('common.labels.optional')"
             >
               <UInput
                 v-model="form.phone"
@@ -182,7 +185,7 @@ async function save() {
                 class="w-full"
               />
             </UFormField>
-            <UFormField label="Język">
+            <UFormField :label="$t('account.profile.language')">
               <USelectMenu
                 v-model="form.locale"
                 :items="localeItems"
@@ -197,27 +200,27 @@ async function save() {
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Dane do faktury
+            {{ $t('account.invoice.title') }}
           </h2>
           <p class="text-xs text-muted">
-            Opcjonalne — używane przy fakturze na firmę.
+            {{ $t('account.invoice.subtitle') }}
           </p>
         </template>
         <div class="space-y-4">
-          <UFormField label="Nazwa firmy">
+          <UFormField :label="$t('account.invoice.companyName')">
             <UInput
               v-model="form.company.name"
               class="w-full"
             />
           </UFormField>
           <div class="grid gap-4 sm:grid-cols-2">
-            <UFormField label="NIP">
+            <UFormField :label="$t('account.invoice.taxId')">
               <UInput
                 v-model="form.company.taxId"
                 class="w-full"
               />
             </UFormField>
-            <UFormField label="Adres">
+            <UFormField :label="$t('account.invoice.address')">
               <UInput
                 v-model="form.company.address"
                 class="w-full"
@@ -229,7 +232,7 @@ async function save() {
 
       <div class="flex justify-end">
         <UButton
-          label="Zapisz"
+          :label="$t('common.actions.save')"
           color="primary"
           icon="i-lucide-check"
           :loading="saving"
@@ -240,7 +243,7 @@ async function save() {
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Zmiana hasła
+            {{ $t('account.password.title') }}
           </h2>
         </template>
 
@@ -252,7 +255,7 @@ async function save() {
           @submit="onChangePassword"
         >
           <UFormField
-            label="Obecne hasło"
+            :label="$t('account.password.current')"
             name="current"
           >
             <UInput
@@ -264,9 +267,9 @@ async function save() {
           </UFormField>
           <div class="grid gap-4 sm:grid-cols-2">
             <UFormField
-              label="Nowe hasło"
+              :label="$t('account.password.new')"
               name="next"
-              hint="min. 6 znaków"
+              :hint="$t('auth.fields.passwordHint')"
             >
               <UInput
                 v-model="pw.next"
@@ -276,7 +279,7 @@ async function save() {
               />
             </UFormField>
             <UFormField
-              label="Powtórz nowe hasło"
+              :label="$t('account.password.confirm')"
               name="confirm"
             >
               <UInput
@@ -290,7 +293,7 @@ async function save() {
           <div class="flex justify-end">
             <UButton
               type="submit"
-              label="Zmień hasło"
+              :label="$t('account.password.submit')"
               color="primary"
               icon="i-lucide-key-round"
               :loading="pwSaving"
@@ -302,25 +305,23 @@ async function save() {
           v-else
           class="text-sm text-muted"
         >
-          Logujesz się przez {{ socialProviders }} — to konto nie ma hasła do zmiany.
+          {{ $t('account.password.socialNote', { providers: socialProviders }) }}
         </p>
       </UCard>
 
       <UCard :ui="{ root: 'ring-error/30' }">
         <template #header>
           <h2 class="font-semibold text-error">
-            Usuń konto
+            {{ $t('account.delete.title') }}
           </h2>
         </template>
         <div class="space-y-4">
           <p class="text-sm text-muted">
-            Konto zostanie zablokowane i trwale usunięte po <strong>7 dniach</strong>. W tym czasie
-            możesz cofnąć decyzję — wystarczy zalogować się ponownie. Po terminie dane usuwa administrator,
-            tak aby zachować spójność historii (np. rezerwacji).
+            {{ $t('account.delete.description') }}
           </p>
           <div class="flex justify-end">
             <UButton
-              label="Usuń konto"
+              :label="$t('account.delete.title')"
               color="error"
               variant="soft"
               icon="i-lucide-trash-2"
@@ -332,28 +333,28 @@ async function save() {
 
       <UModal
         v-model:open="deleteOpen"
-        title="Usunąć konto?"
+        :title="$t('account.delete.confirmTitle')"
       >
         <template #body>
           <div class="space-y-3 text-sm">
             <p>
-              Zaplanujemy usunięcie Twojego konta za <strong>7 dni</strong> i wylogujemy Cię teraz.
+              {{ $t('account.delete.confirmBody1') }}
             </p>
             <p class="text-muted">
-              Zmieniłeś zdanie? Zaloguj się ponownie przed upływem terminu, a proces zostanie anulowany.
+              {{ $t('account.delete.confirmBody2') }}
             </p>
           </div>
         </template>
         <template #footer>
           <div class="flex justify-end gap-2 w-full">
             <UButton
-              label="Anuluj"
+              :label="$t('common.actions.cancel')"
               color="neutral"
               variant="ghost"
               @click="deleteOpen = false"
             />
             <UButton
-              label="Tak, usuń konto"
+              :label="$t('account.delete.confirmButton')"
               color="error"
               icon="i-lucide-trash-2"
               :loading="deleting"

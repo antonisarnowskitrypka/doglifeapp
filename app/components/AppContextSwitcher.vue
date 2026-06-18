@@ -7,6 +7,7 @@ const props = defineProps({
 const ctx = useContextStore()
 const { user } = useAuth()
 const { openLogin } = useAuthModal()
+const { t } = useI18n()
 const isLoggedIn = computed(() => !!user.value)
 const isProvider = computed(() => ctx.activeContext.type === 'org')
 
@@ -20,7 +21,7 @@ const items = computed(() => {
   const active = ctx.activeKey
 
   const opiekun = {
-    label: 'Opiekun',
+    label: t('common.context.opiekun'),
     avatar: ctx.user?.avatarUrl ? { src: ctx.user.avatarUrl } : undefined,
     icon: ctx.user?.avatarUrl ? undefined : 'i-lucide-paw-print',
     trailingIcon: active === 'opiekun' ? 'i-lucide-check' : undefined,
@@ -35,7 +36,7 @@ const items = computed(() => {
     onSelect: () => switchTo(m.membershipId, '/provider')
   }))
 
-  const become = { label: 'Załóż firmę', icon: 'i-lucide-plus', to: '/onboarding' }
+  const become = { label: t('nav.createCompany'), icon: 'i-lucide-plus', to: '/onboarding' }
 
   return [[opiekun], orgs.length ? orgs : [], [become]].filter(g => g.length)
 })
@@ -44,20 +45,20 @@ const items = computed(() => {
 const contextAvatar = computed(() =>
   (isProvider.value ? ctx.activeContext.membership?.avatarUrl : null) || ctx.user?.avatarUrl || undefined
 )
-const displayName = computed(() => ctx.user?.displayName || user.value?.displayName || 'Konto')
+const displayName = computed(() => ctx.user?.displayName || user.value?.displayName || t('common.labels.account'))
 // Compact rail (not block): show only the first name to fit the narrow side rail.
 const triggerName = computed(() => (props.block ? displayName.value : displayName.value.split(' ')[0]))
 const companyName = computed(() => (isProvider.value ? ctx.activeContext.membership?.organizationName : ''))
 const roleChip = computed(() => {
-  if (!isProvider.value) return 'OPIEKUN'
-  return ctx.activeContext.membership?.role === 'owner' ? 'WŁAŚCICIEL' : 'PRACOWNIK'
+  if (!isProvider.value) return t('common.roles.opiekun')
+  return ctx.activeContext.membership?.role === 'owner' ? t('common.roles.owner') : t('common.roles.staff')
 })
 </script>
 
 <template>
   <UButton
     v-if="!isLoggedIn"
-    label="Zaloguj się"
+    :label="$t('auth.actions.login')"
     color="primary"
     icon="i-lucide-log-in"
     :block="block"

@@ -2,6 +2,7 @@
 const emit = defineEmits(['success', 'error'])
 
 const { signInWithGoogle, signInWithApple } = useAuth()
+const { t } = useI18n()
 const loading = ref(null) // 'google' | 'apple' | null
 
 async function run(provider, fn) {
@@ -12,7 +13,7 @@ async function run(provider, fn) {
   } catch (e) {
     // Popup closed by the user is not an error worth surfacing.
     if (e?.code !== 'auth/popup-closed-by-user' && e?.code !== 'auth/cancelled-popup-request') {
-      emit('error', e?.message || 'Nie udało się zalogować przez dostawcę.')
+      emit('error', e?.message || t('auth.social.error'))
     }
   } finally {
     loading.value = null
@@ -24,7 +25,7 @@ async function run(provider, fn) {
   <div class="grid gap-2">
     <UButton
       icon="i-simple-icons-google"
-      label="Kontynuuj z Google"
+      :label="$t('auth.social.google')"
       color="neutral"
       variant="outline"
       block
@@ -34,7 +35,7 @@ async function run(provider, fn) {
     />
     <UButton
       icon="i-simple-icons-apple"
-      label="Kontynuuj z Apple"
+      :label="$t('auth.social.apple')"
       color="neutral"
       variant="outline"
       block

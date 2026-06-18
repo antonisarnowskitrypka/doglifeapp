@@ -1,10 +1,12 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Zespół — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.staff.metaTitle') })
 
 const ctx = useContextStore()
 const authFetch = useAuthFetch()
 const toast = useToast()
+const { apiErrorMessage } = useApiError()
 
 const orgId = computed(() => ctx.activeContext.membership?.organizationId)
 const isOwner = computed(() => ctx.activeContext.membership?.role === 'owner')
@@ -21,7 +23,7 @@ async function loadStaff() {
     const r = await authFetch(`/api/orgs/${orgId.value}/staff`)
     members.value = r.members
   } catch (e) {
-    loadError.value = e?.statusMessage || 'Nie udało się wczytać zespołu.'
+    loadError.value = apiErrorMessage(e, 'provider.staff.loadError')
   } finally {
     loading.value = false
   }
@@ -45,14 +47,14 @@ async function invite() {
     const r = await authFetch(`/api/orgs/${orgId.value}/staff`, { method: 'POST', body: { email: email.value.trim() } })
     toast.add({
       title: r.status === 'pending'
-        ? 'Zaproszenie zapisane — osoba dołączy po założeniu konta.'
-        : 'Zaproszono do zespołu.',
+        ? t('provider.staff.invitePending')
+        : t('provider.staff.invited'),
       color: 'success'
     })
     email.value = ''
     loadStaff()
   } catch (e) {
-    inviteError.value = e?.statusMessage || e?.data?.statusMessage || 'Nie udało się zaprosić.'
+    inviteError.value = apiErrorMessage(e, 'provider.staff.inviteError')
   } finally {
     inviting.value = false
   }
@@ -63,14 +65,14 @@ async function remove(m) {
     await authFetch(`/api/orgs/${orgId.value}/staff/${m.membershipId}`, { method: 'DELETE' })
     loadStaff()
   } catch (e) {
-    toast.add({ title: e?.statusMessage || 'Nie udało się usunąć.', color: 'error' })
+    toast.add({ title: apiErrorMessage(e, 'provider.staff.removeError'), color: 'error' })
   }
 }
 
 const STATUS = {
-  active: { label: 'Aktywny', color: 'success' },
-  invited: { label: 'Zaproszony', color: 'warning' },
-  pending: { label: 'Oczekuje (brak konta)', color: 'neutral' }
+  active: { label: t('provider.staff.statusActive'), color: 'success' },
+  invited: { label: t('provider.staff.statusInvited'), color: 'warning' },
+  pending: { label: t('provider.staff.statusPending'), color: 'neutral' }
 }
 
 // Owner edits a member's per-org profile in a slideover.
@@ -85,10 +87,10 @@ function onMemberSaved() {
   <UContainer class="py-8 max-w-2xl space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-highlighted">
-        Zespół
+        {{ $t('provider.staff.title') }}
       </h1>
       <p class="text-muted text-sm">
-        Zapraszaj pracowników do firmy i zarządzaj dostępem.
+        {{ $t('provider.staff.subtitle') }}
       </p>
     </div>
 
@@ -97,15 +99,15 @@ function onMemberSaved() {
       color="info"
       variant="subtle"
       icon="i-lucide-info"
-      title="Tylko właściciel zarządza zespołem"
-      description="Skontaktuj się z właścicielem firmy, aby zmienić skład zespołu."
+      :title="$t('provider.staff.notOwnerTitle')"
+      :description="$t('provider.staff.notOwnerDescription')"
     />
 
     <template v-else>
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Zaproś pracownika
+            {{ $t('provider.staff.inviteHeading') }}
           </h2>
         </template>
         <form
@@ -115,13 +117,13 @@ function onMemberSaved() {
           <UInput
             v-model="email"
             type="email"
-            placeholder="email@pracownik.pl"
+            :placeholder="$t('provider.staff.inviteEmailPlaceholder')"
             class="flex-1"
             autocomplete="off"
           />
           <UButton
             type="submit"
-            label="Zaproś"
+            :label="$t('provider.staff.inviteButton')"
             icon="i-lucide-user-plus"
             color="primary"
             :loading="inviting"
@@ -139,7 +141,7 @@ function onMemberSaved() {
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="font-semibold">
-              Członkowie
+              {{ $t('provider.staff.membersHeading') }}
             </h2>
             <UButton
               size="xs"
@@ -173,14 +175,14 @@ function onMemberSaved() {
             />
             <div class="flex-1 min-w-0">
               <p class="font-medium truncate">
-                {{ m.displayName || m.email || 'Zaproszony' }}
+                {{ m.displayName || m.email || $t('provider.staff.fallbackInvited') }}
               </p>
               <p class="text-xs text-muted truncate">
                 {{ m.email }}
               </p>
             </div>
             <UBadge
-              :label="m.role === 'owner' ? 'Właściciel' : 'Pracownik'"
+              :label="m.role === 'owner' ? $t('provider.staff.roleOwner') : $t('provider.staff.roleStaff')"
               variant="subtle"
               :color="m.role === 'owner' ? 'primary' : 'neutral'"
             />
@@ -194,7 +196,7 @@ function onMemberSaved() {
               color="neutral"
               variant="ghost"
               size="xs"
-              aria-label="Edytuj profil"
+              :aria-label="$t('provider.staff.editAria')"
               @click="editing = m"
             />
             <UButton
@@ -203,7 +205,7 @@ function onMemberSaved() {
               color="error"
               variant="ghost"
               size="xs"
-              aria-label="Usuń"
+              :aria-label="$t('provider.staff.removeAria')"
               @click="remove(m)"
             />
           </div>
@@ -213,7 +215,7 @@ function onMemberSaved() {
 
     <USlideover
       v-model:open="editOpen"
-      :title="`Profil: ${editing?.displayName || editing?.email || ''}`"
+      :title="$t('provider.staff.editTitle', { name: editing?.displayName || editing?.email || '' })"
     >
       <template #body>
         <StaffProfileForm

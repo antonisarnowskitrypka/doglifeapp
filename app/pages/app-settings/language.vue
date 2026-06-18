@@ -1,12 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'shared' })
-useHead({ title: 'Język aplikacji — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('appSettings.language.metaTitle') })
 </script>
 
 <template>
   <AppPagePlaceholder
-    title="Język aplikacji"
+    :title="$t('appSettings.language.title')"
     icon="i-lucide-languages"
-    description="Wybór języka interfejsu (pl / en / bg). Wkrótce."
+    :description="$t('appSettings.language.placeholder')"
   />
 </template>

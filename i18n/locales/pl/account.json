@@ -1,0 +1,49 @@
+{
+  "account": {
+    "title": "Ustawienia",
+    "menu": {
+      "settings": "Ustawienia konta"
+    },
+    "meta": {
+      "title": "Ustawienia — DogLife"
+    },
+    "signinAlert": {
+      "title": "Zaloguj się, aby zarządzać kontem"
+    },
+    "profile": {
+      "title": "Profil",
+      "displayName": "Imię / nazwa wyświetlana",
+      "bio": "O mnie",
+      "phone": "Telefon",
+      "language": "Język",
+      "saved": "Zapisano zmiany."
+    },
+    "invoice": {
+      "title": "Dane do faktury",
+      "subtitle": "Opcjonalne — używane przy fakturze na firmę.",
+      "companyName": "Nazwa firmy",
+      "taxId": "NIP",
+      "address": "Adres"
+    },
+    "password": {
+      "title": "Zmiana hasła",
+      "current": "Obecne hasło",
+      "new": "Nowe hasło",
+      "confirm": "Powtórz nowe hasło",
+      "submit": "Zmień hasło",
+      "changed": "Hasło zostało zmienione.",
+      "socialNote": "Logujesz się przez {providers} — to konto nie ma hasła do zmiany.",
+      "socialFallback": "zewnętrznego dostawcę"
+    },
+    "delete": {
+      "title": "Usuń konto",
+      "description": "Konto zostanie zablokowane i trwale usunięte po 7 dniach. W tym czasie możesz cofnąć decyzję — wystarczy zalogować się ponownie. Po terminie dane usuwa administrator, tak aby zachować spójność historii (np. rezerwacji).",
+      "confirmTitle": "Usunąć konto?",
+      "confirmBody1": "Zaplanujemy usunięcie Twojego konta za 7 dni i wylogujemy Cię teraz.",
+      "confirmBody2": "Zmieniłeś zdanie? Zaloguj się ponownie przed upływem terminu, a proces zostanie anulowany.",
+      "confirmButton": "Tak, usuń konto",
+      "scheduledTitle": "Zaplanowano usunięcie konta.",
+      "scheduledBody": "Konto zostanie usunięte za 7 dni. Zaloguj się ponownie w tym czasie, aby anulować."
+    }
+  }
+}

@@ -1,12 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Usługi — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.services.metaTitle') })
 </script>
 
 <template>
   <AppPagePlaceholder
-    title="Usługi"
+    :title="$t('provider.services.placeholderTitle')"
     icon="i-lucide-list"
-    description="Oferta, tryby i ceny usług firmy. Wkrótce."
+    :description="$t('provider.services.placeholderDescription')"
   />
 </template>

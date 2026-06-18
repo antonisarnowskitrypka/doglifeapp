@@ -1,12 +1,14 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'public' })
-useHead({ title: 'DogLife' })
+const { t } = useI18n()
+useHead({ title: t('home.meta.title') })
 
 const ctx = useContextStore()
 const { user } = useAuth()
 const { openLogin, openSignup } = useAuthModal()
 const authFetch = useAuthFetch()
 const toast = useToast()
+const { apiErrorMessage } = useApiError()
 const isLoggedIn = computed(() => !!user.value)
 
 const acceptingId = ref(null)
@@ -15,9 +17,9 @@ async function acceptInvite(invite) {
   try {
     await authFetch(`/api/invites/${invite.membershipId}/accept`, { method: 'POST' })
     await ctx.load(true)
-    toast.add({ title: `Dołączono do firmy ${invite.organizationName}.`, color: 'success' })
+    toast.add({ title: t('home.invites.accepted', { name: invite.organizationName }), color: 'success' })
   } catch (e) {
-    toast.add({ title: e?.statusMessage || 'Nie udało się przyjąć zaproszenia.', color: 'error' })
+    toast.add({ title: apiErrorMessage(e, 'home.invites.error'), color: 'error' })
   } finally {
     acceptingId.value = null
   }
@@ -25,10 +27,10 @@ async function acceptInvite(invite) {
 
 // Opiekun dashboard — placeholder. Four blocks per ui-docs/02 (full spec deferred to 03-dashboard).
 const blocks = [
-  { title: 'Najbliższa rezerwacja', icon: 'i-lucide-calendar-clock', empty: 'Brak nadchodzących rezerwacji.' },
-  { title: 'Przypomnienia', icon: 'i-lucide-bell-ring', empty: 'Brak przypomnień (zdrowie, prace domowe).' },
-  { title: 'Skróty', icon: 'i-lucide-zap', empty: 'Szybkie akcje pojawią się tutaj.' },
-  { title: 'Obserwowane wydarzenia', icon: 'i-lucide-calendar-heart', empty: 'Nie obserwujesz jeszcze wydarzeń.' }
+  { title: t('home.blocks.nextBooking.title'), icon: 'i-lucide-calendar-clock', empty: t('home.blocks.nextBooking.empty') },
+  { title: t('home.blocks.reminders.title'), icon: 'i-lucide-bell-ring', empty: t('home.blocks.reminders.empty') },
+  { title: t('home.blocks.shortcuts.title'), icon: 'i-lucide-zap', empty: t('home.blocks.shortcuts.empty') },
+  { title: t('home.blocks.events.title'), icon: 'i-lucide-calendar-heart', empty: t('home.blocks.events.empty') }
 ]
 </script>
 
@@ -38,22 +40,22 @@ const blocks = [
     <template v-if="!isLoggedIn">
       <div class="space-y-2">
         <h1 class="text-2xl font-bold text-highlighted">
-          Witaj w DogLife
+          {{ $t('home.anon.title') }}
         </h1>
         <p class="text-muted">
-          Zaloguj się lub załóż konto, aby rezerwować usługi, zarządzać zwierzakami i prowadzić firmę.
+          {{ $t('home.anon.description') }}
         </p>
       </div>
 
       <div class="flex flex-wrap gap-2">
         <UButton
-          label="Załóż konto"
+          :label="$t('auth.actions.signup')"
           color="primary"
           trailing-icon="i-lucide-arrow-right"
           @click="openSignup"
         />
         <UButton
-          label="Zaloguj się"
+          :label="$t('auth.actions.login')"
           color="neutral"
           variant="subtle"
           @click="openLogin"
@@ -63,7 +65,7 @@ const blocks = [
       <UCard>
         <template #header>
           <h2 class="font-semibold">
-            Dostępne bez logowania
+            {{ $t('home.anon.availableTitle') }}
           </h2>
         </template>
         <div class="grid gap-3 sm:grid-cols-2">
@@ -73,7 +75,7 @@ const blocks = [
             color="neutral"
             variant="outline"
             icon="i-lucide-search"
-            label="Szukaj usług"
+            :label="$t('home.anon.searchServices')"
             to="/search"
           />
           <UButton
@@ -82,7 +84,7 @@ const blocks = [
             color="neutral"
             variant="outline"
             icon="i-lucide-settings"
-            label="Ustawienia"
+            :label="$t('home.anon.settings')"
             to="/settings"
           />
         </div>
@@ -93,10 +95,10 @@ const blocks = [
     <template v-else>
       <div>
         <h1 class="text-2xl font-bold text-highlighted">
-          Cześć, {{ ctx.user?.displayName || user?.displayName || 'Opiekunie' }} 👋
+          {{ $t('home.dashboard.greeting', { name: ctx.user?.displayName || user?.displayName || $t('home.dashboard.fallbackName') }) }}
         </h1>
         <p class="text-muted text-sm">
-          Twój pulpit opiekuna.
+          {{ $t('home.dashboard.subtitle') }}
         </p>
       </div>
 
@@ -111,7 +113,7 @@ const blocks = [
               class="size-5 text-primary"
             />
             <h2 class="font-semibold">
-              Zaproszenia do firmy
+              {{ $t('home.invites.title') }}
             </h2>
           </div>
         </template>
@@ -131,11 +133,11 @@ const blocks = [
                 {{ inv.organizationName }}
               </p>
               <p class="text-xs text-muted">
-                zaproszenie jako pracownik
+                {{ $t('home.invites.role') }}
               </p>
             </div>
             <UButton
-              label="Dołącz"
+              :label="$t('home.invites.join')"
               color="primary"
               size="sm"
               :loading="acceptingId === inv.membershipId"

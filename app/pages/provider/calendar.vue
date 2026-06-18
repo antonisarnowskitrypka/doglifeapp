@@ -1,8 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Kalendarz — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.calendar.metaTitle') })
 </script>
 
 <template>
-  <AppPagePlaceholder title="Kalendarz" icon="i-lucide-calendar-days" description="Widok tygodnia: dostępność, rezerwacje, nieobecności, eventy (Faza B, ui-docs/01)." />
+  <AppPagePlaceholder
+    :title="$t('provider.calendar.placeholderTitle')"
+    icon="i-lucide-calendar-days"
+    :description="$t('provider.calendar.placeholderDescription')"
+  />
 </template>

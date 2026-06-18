@@ -17,7 +17,7 @@ export async function requireMemberEdit(
   const memberRef = db.collection('organizationMembers').doc(membershipId)
   const memberSnap = await memberRef.get()
   if (!memberSnap.exists || memberSnap.get('organizationId') !== organizationId) {
-    throw createError({ statusCode: 404, statusMessage: 'Nie znaleziono członka zespołu.' })
+    throw apiError(404, 'errors.api.staff.notFound')
   }
 
   const isSelf = memberSnap.get('userId') === decoded.uid
@@ -29,10 +29,10 @@ export async function requireMemberEdit(
     .where('status', '==', 'active')
     .limit(1)
     .get()
-  const isOwner = !ownerSnap.empty && ownerSnap.docs[0].get('role') === 'owner'
+  const isOwner = ownerSnap.docs[0]?.get('role') === 'owner'
 
   if (!isSelf && !isOwner) {
-    throw createError({ statusCode: 403, statusMessage: 'Brak uprawnień do edycji tego profilu.' })
+    throw apiError(403, 'errors.api.staff.editForbidden')
   }
 
   return { uid: decoded.uid, memberRef, memberSnap, isOwner }

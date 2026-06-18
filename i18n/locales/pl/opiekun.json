@@ -1,0 +1,24 @@
+{
+  "opiekun": {
+    "pets": {
+      "metaTitle": "Zwierzaki — DogLife",
+      "title": "Życie zwierzaka",
+      "description": "Lista zwierzaków, profil i Życie zwierzaka (Faza C/F planu UI)."
+    },
+    "bookings": {
+      "metaTitle": "Rezerwacje — DogLife",
+      "title": "Moje rezerwacje",
+      "description": "Lista i szczegóły rezerwacji opiekuna (Faza C/D planu UI)."
+    },
+    "search": {
+      "metaTitle": "Szukaj — DogLife",
+      "title": "Szukaj usług",
+      "description": "Wyszukiwarka z filtrami, lokalizacją i rankingiem (Faza C planu UI)."
+    },
+    "notifications": {
+      "metaTitle": "Powiadomienia — DogLife",
+      "title": "Powiadomienia",
+      "description": "Centrum powiadomień i preferencje kanałów (Faza D planu UI)."
+    }
+  }
+}

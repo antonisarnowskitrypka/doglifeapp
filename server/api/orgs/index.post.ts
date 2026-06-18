@@ -7,7 +7,7 @@ const VALID_CATEGORIES = new Set([
 const VALID_SPECIES = new Set(['dog', 'cat'])
 
 defineRouteMeta({
-  openAPI: {
+  openAPI: openApiOperation({
     tags: ['Organizations'],
     summary: 'Create an organization (draft) + owner membership',
     description: 'Provider creator: makes a `draft` organization (hidden, not bookable) and an active `owner` membership for the caller. Publishing happens later via the onboarding checklist. See dev-docs/20-accounts-and-membership.md.',
@@ -48,7 +48,7 @@ defineRouteMeta({
       400: { description: 'Validation error' },
       401: { description: 'Missing or invalid auth token' }
     }
-  }
+  })
 })
 
 export default defineEventHandler(async (event) => {
@@ -57,12 +57,12 @@ export default defineEventHandler(async (event) => {
 
   const name = (body.name || '').trim()
   if (name.length < 2) {
-    throw createError({ statusCode: 400, statusMessage: 'Podaj nazwę firmy (min. 2 znaki).' })
+    throw apiError(400, 'errors.api.org.nameMin')
   }
 
   const categoryKeys = [...new Set((body.categoryKeys || []).filter(k => VALID_CATEGORIES.has(k)))]
   if (!categoryKeys.length) {
-    throw createError({ statusCode: 400, statusMessage: 'Wybierz co najmniej jedną kategorię.' })
+    throw apiError(400, 'errors.api.org.categoryRequired')
   }
 
   const acceptedSpecies = [...new Set((body.acceptedSpecies || []).filter(s => VALID_SPECIES.has(s)))]

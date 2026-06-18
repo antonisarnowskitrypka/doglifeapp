@@ -1,0 +1,107 @@
+{
+  "provider": {
+    "dashboard": {
+      "metaTitle": "Pulpit firmy — DogLife",
+      "placeholderTitle": "Pulpit firmy",
+      "placeholderDescription": "Dashboard providera: najbliższe rezerwacje, przypomnienia, skróty (ui-docs/02 + Faza E)."
+    },
+    "calendar": {
+      "metaTitle": "Kalendarz — DogLife",
+      "placeholderTitle": "Kalendarz",
+      "placeholderDescription": "Widok tygodnia: dostępność, rezerwacje, nieobecności, eventy (Faza B, ui-docs/01)."
+    },
+    "bookings": {
+      "metaTitle": "Rezerwacje & Klienci — DogLife",
+      "placeholderTitle": "Rezerwacje & Klienci",
+      "placeholderDescription": "Skrzynka rezerwacji, potwierdzenia, klienci (Faza B/D planu UI)."
+    },
+    "finance": {
+      "metaTitle": "Panel — DogLife",
+      "placeholderTitle": "Panel firmy",
+      "placeholderDescription": "Finanse, faktury, analityka i billing/Pro (Faza E planu UI)."
+    },
+    "profile": {
+      "metaTitle": "Profil firmy — DogLife",
+      "title": "Profil firmy",
+      "notOwnerTitle": "Tylko właściciel edytuje profil firmy",
+      "notOwnerDescription": "Swój profil pracownika ustawisz w sekcji „Mój profil w firmie”.",
+      "companyHeading": "Dane firmy",
+      "name": "Nazwa firmy",
+      "description": "Opis",
+      "descriptionHint": "widoczny na profilu publicznym",
+      "categories": "Kategorie usług",
+      "species": "Obsługiwane gatunki",
+      "invoiceHeading": "Dane do faktury",
+      "invoiceName": "Nazwa (na fakturze)",
+      "taxId": "NIP",
+      "address": "Adres",
+      "loadError": "Nie udało się wczytać firmy.",
+      "saved": "Zapisano profil firmy."
+    },
+    "me": {
+      "metaTitle": "Mój profil firmowy — DogLife",
+      "subtitle": "Jak prezentujesz się w {organizationName}. Avatar może być firmowy (np. w koszulce zespołu)."
+    },
+    "staff": {
+      "metaTitle": "Zespół — DogLife",
+      "title": "Zespół",
+      "subtitle": "Zapraszaj pracowników do firmy i zarządzaj dostępem.",
+      "notOwnerTitle": "Tylko właściciel zarządza zespołem",
+      "notOwnerDescription": "Skontaktuj się z właścicielem firmy, aby zmienić skład zespołu.",
+      "inviteHeading": "Zaproś pracownika",
+      "inviteEmailPlaceholder": "email@pracownik.pl",
+      "inviteButton": "Zaproś",
+      "invitePending": "Zaproszenie zapisane — osoba dołączy po założeniu konta.",
+      "invited": "Zaproszono do zespołu.",
+      "inviteError": "Nie udało się zaprosić.",
+      "loadError": "Nie udało się wczytać zespołu.",
+      "removeError": "Nie udało się usunąć.",
+      "membersHeading": "Członkowie",
+      "statusActive": "Aktywny",
+      "statusInvited": "Zaproszony",
+      "statusPending": "Oczekuje (brak konta)",
+      "fallbackInvited": "Zaproszony",
+      "roleOwner": "Właściciel",
+      "roleStaff": "Pracownik",
+      "editAria": "Edytuj profil",
+      "removeAria": "Usuń",
+      "editTitle": "Profil: {name}"
+    },
+    "services": {
+      "metaTitle": "Usługi — DogLife",
+      "placeholderTitle": "Usługi",
+      "placeholderDescription": "Oferta, tryby i ceny usług firmy. Wkrótce."
+    },
+    "reviews": {
+      "metaTitle": "Moje opinie — DogLife",
+      "placeholderTitle": "Moje opinie",
+      "placeholderDescription": "Opinie wystawione Tobie jako pracownikowi firmy. Wkrótce."
+    },
+    "locations": {
+      "metaTitle": "Lokalizacje i godziny — DogLife",
+      "placeholderTitle": "Lokalizacje i godziny",
+      "placeholderDescription": "Adresy, strefa czasowa i grafik pracy firmy. Wkrótce."
+    },
+    "settingsHub": {
+      "metaTitle": "Ustawienia firmy — DogLife",
+      "meProfileDescription": "Twój opis, języki, zdjęcie",
+      "reviewsDescription": "Opinie wystawione Tobie",
+      "companyProfileDescription": "Nazwa, opis, logo, dane do faktury",
+      "staffDescription": "Pracownicy i zaproszenia",
+      "servicesDescription": "Oferta, tryby, ceny",
+      "locationsDescription": "Adresy, strefa czasowa, grafik",
+      "notificationsDescription": "Co i jak Cię informujemy",
+      "languageDescription": "Język interfejsu",
+      "appearanceDescription": "Motyw jasny / ciemny"
+    },
+    "staffForm": {
+      "shortDescription": "Krótki opis",
+      "shortDescriptionHint": "przy nazwisku, do 160 znaków",
+      "longDescription": "Pełny opis",
+      "longDescriptionHint": "rozwijany „pokaż więcej”",
+      "languages": "Języki",
+      "languagesPlaceholder": "Wybierz języki",
+      "saved": "Zapisano profil."
+    }
+  }
+}

@@ -12,6 +12,8 @@ const emit = defineEmits(['uploaded'])
 
 const authFetch = useAuthFetch()
 const toast = useToast()
+const { t } = useI18n()
+const { apiErrorMessage } = useApiError()
 const input = ref(null)
 const uploading = ref(false)
 const preview = ref(props.src || null)
@@ -31,9 +33,9 @@ async function onChange(e) {
     const r = await authFetch(props.endpoint, { method: 'PUT', body: fd })
     preview.value = r.avatarUrl || r.logoUrl
     emit('uploaded', preview.value)
-    toast.add({ title: 'Zapisano zdjęcie.', color: 'success' })
+    toast.add({ title: t('common.uploader.saved'), color: 'success' })
   } catch (err) {
-    toast.add({ title: err?.statusMessage || err?.data?.statusMessage || 'Nie udało się wgrać zdjęcia.', color: 'error' })
+    toast.add({ title: apiErrorMessage(err, 'common.uploader.error'), color: 'error' })
   } finally {
     uploading.value = false
     if (input.value) input.value.value = ''
@@ -58,7 +60,7 @@ async function onChange(e) {
         @change="onChange"
       >
       <UButton
-        :label="preview ? 'Zmień zdjęcie' : 'Dodaj zdjęcie'"
+        :label="preview ? $t('common.uploader.change') : $t('common.uploader.add')"
         icon="i-lucide-upload"
         color="neutral"
         variant="outline"
@@ -67,7 +69,7 @@ async function onChange(e) {
         @click="pick"
       />
       <p class="text-xs text-muted mt-1">
-        JPG / PNG / WEBP / HEIC, do 10 MB.
+        {{ $t('common.uploader.hint') }}
       </p>
     </div>
   </div>

@@ -1,5 +1,5 @@
 defineRouteMeta({
-  openAPI: {
+  openAPI: openApiOperation({
     tags: ['Staff'],
     summary: 'Update a staff member\'s per-org profile',
     description: 'Editable by the member themselves or an Owner. Sets the professional blurb (short/long) and spoken languages. See dev-docs/20 & 22.',
@@ -28,12 +28,12 @@ defineRouteMeta({
       403: { description: 'Not the member nor an owner' },
       404: { description: 'Membership not found in this organization' }
     }
-  }
+  })
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
-  const membershipId = getRouterParam(event, 'membershipId')
+  const orgId = getRequiredParam(event, 'orgId')
+  const membershipId = getRequiredParam(event, 'membershipId')
   const { memberRef } = await requireMemberEdit(event, orgId, membershipId)
 
   const body = await readBody<Record<string, unknown>>(event)

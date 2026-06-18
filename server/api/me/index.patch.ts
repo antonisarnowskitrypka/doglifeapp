@@ -1,7 +1,7 @@
 const LOCALES = new Set(['pl', 'en', 'bg'])
 
 defineRouteMeta({
-  openAPI: {
+  openAPI: openApiOperation({
     tags: ['Profile'],
     summary: 'Update the current user\'s profile',
     description: 'Updates editable fields on `users`: display name, bio, phone, locale, and company (invoice) details. See dev-docs/20.',
@@ -35,7 +35,7 @@ defineRouteMeta({
       400: { description: 'Validation error' },
       401: { description: 'Missing or invalid auth token' }
     }
-  }
+  })
 })
 
 export default defineEventHandler(async (event) => {
@@ -46,13 +46,13 @@ export default defineEventHandler(async (event) => {
 
   if (body.displayName !== undefined) {
     const v = String(body.displayName).trim()
-    if (v.length < 1) throw createError({ statusCode: 400, statusMessage: 'Imię nie może być puste.' })
+    if (v.length < 1) throw apiError(400, 'errors.api.profile.nameEmpty')
     update.displayName = v.slice(0, 80)
   }
   if (body.bio !== undefined) update.bio = body.bio ? String(body.bio).slice(0, 1000) : null
   if (body.phone !== undefined) update.phone = body.phone ? String(body.phone).trim().slice(0, 32) : null
   if (body.locale !== undefined) {
-    if (!LOCALES.has(String(body.locale))) throw createError({ statusCode: 400, statusMessage: 'Nieobsługiwany język.' })
+    if (!LOCALES.has(String(body.locale))) throw apiError(400, 'errors.api.profile.unsupportedLocale')
     update.locale = body.locale
   }
   if (body.companyDetails !== undefined) {

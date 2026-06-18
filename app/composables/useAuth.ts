@@ -30,6 +30,7 @@ export function useAuth() {
   const user = useCurrentUser()
   const authFetch = useAuthFetch()
   const toast = useToast()
+  const { t } = useI18n()
 
   /** Upsert the users doc for the signed-in account (idempotent). */
   async function sync() {
@@ -37,8 +38,8 @@ export function useAuth() {
     // Signing back in within the 7-day window halts a scheduled deletion (see settings.vue).
     if (res?.deletionCancelled) {
       toast.add({
-        title: 'Anulowano usuwanie konta.',
-        description: 'Witaj z powrotem — Twoje konto znów jest aktywne.',
+        title: t('auth.deletionCancelled.title'),
+        description: t('auth.deletionCancelled.body'),
         color: 'success',
         icon: 'i-lucide-shield-check'
       })
@@ -88,7 +89,7 @@ export function useAuth() {
   /** (Re)send the verification email to the current user. */
   async function sendVerification() {
     const u = ensureAuth().currentUser
-    if (!u) throw new Error('Brak zalogowanego użytkownika.')
+    if (!u) throw new Error('No signed-in user')
     await sendEmailVerification(u)
   }
 
@@ -98,7 +99,7 @@ export function useAuth() {
    */
   async function changePassword(currentPassword: string, newPassword: string) {
     const u = ensureAuth().currentUser
-    if (!u?.email) throw new Error('To konto nie ma logowania hasłem.')
+    if (!u?.email) throw new Error('Account has no password provider')
     await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, currentPassword))
     await updatePassword(u, newPassword)
   }

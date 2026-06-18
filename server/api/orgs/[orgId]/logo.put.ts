@@ -22,7 +22,7 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
+  const orgId = getRequiredParam(event, 'orgId')
   await requireOrgRole(event, orgId, ['owner'])
 
   const { buffer, contentType } = await readUploadedImage(event)

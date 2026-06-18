@@ -1,0 +1,24 @@
+{
+  "onboarding": {
+    "meta": {
+      "title": "Załóż firmę — DogLife"
+    },
+    "title": "Załóż firmę",
+    "subtitle": "Utworzymy firmę jako wersję roboczą. Resztę (lokalizacje, usługi, grafik, płatności) uzupełnisz później przed publikacją.",
+    "fields": {
+      "name": "Nazwa firmy",
+      "namePlaceholder": "np. Akademia Psa Burek",
+      "categories": "Kategorie usług",
+      "categoriesHint": "możesz wybrać kilka",
+      "categoriesPlaceholder": "Wybierz kategorie",
+      "species": "Obsługiwane gatunki"
+    },
+    "validation": {
+      "name": "Podaj nazwę (min. 2 znaki)",
+      "categories": "Wybierz min. jedną kategorię",
+      "species": "Zaznacz min. jeden gatunek"
+    },
+    "submit": "Załóż firmę",
+    "error": "Nie udało się założyć firmy."
+  }
+}

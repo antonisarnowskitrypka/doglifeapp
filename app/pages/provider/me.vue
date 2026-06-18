@@ -1,6 +1,7 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Mój profil firmowy — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.me.metaTitle') })
 
 const ctx = useContextStore()
 const m = computed(() => ctx.activeContext.membership)
@@ -12,10 +13,10 @@ onMounted(() => ctx.load())
   <UContainer class="py-8 max-w-2xl space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-highlighted">
-        Mój profil firmowy
+        {{ $t('nav.myCard.profile') }}
       </h1>
       <p class="text-muted text-sm">
-        Jak prezentujesz się w {{ m?.organizationName }}. Avatar może być firmowy (np. w koszulce zespołu).
+        {{ $t('provider.me.subtitle', { organizationName: m?.organizationName }) }}
       </p>
     </div>
 

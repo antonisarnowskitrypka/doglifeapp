@@ -1,6 +1,7 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'shared' })
-useHead({ title: 'Wygląd — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('appSettings.appearance.metaTitle') })
 
 // @nuxt/ui ships @nuxtjs/color-mode; `preference` is the persisted user choice
 // ('system' | 'light' | 'dark'), backed by a cookie so it survives reloads.
@@ -10,28 +11,28 @@ const theme = computed({
   set: (value) => { colorMode.preference = value }
 })
 
-const options = [
-  { label: 'Jasny', value: 'light', description: 'Zawsze jasny motyw.' },
-  { label: 'Ciemny', value: 'dark', description: 'Zawsze ciemny motyw.' },
-  { label: 'Systemowy', value: 'system', description: 'Dopasuj do ustawień urządzenia.' }
-]
+const options = computed(() => [
+  { label: t('appSettings.appearance.light'), value: 'light', description: t('appSettings.appearance.lightHint') },
+  { label: t('appSettings.appearance.dark'), value: 'dark', description: t('appSettings.appearance.darkHint') },
+  { label: t('appSettings.appearance.system'), value: 'system', description: t('appSettings.appearance.systemHint') }
+])
 </script>
 
 <template>
   <UContainer class="py-8 max-w-2xl space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-highlighted">
-        Wygląd
+        {{ $t('appSettings.appearance.title') }}
       </h1>
       <p class="text-muted text-sm">
-        Motyw aplikacji — zmiana działa od razu.
+        {{ $t('appSettings.appearance.subtitle') }}
       </p>
     </div>
 
     <UCard>
       <template #header>
         <h2 class="font-semibold">
-          Motyw
+          {{ $t('appSettings.appearance.themeHeading') }}
         </h2>
       </template>
 

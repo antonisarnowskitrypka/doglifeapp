@@ -1,12 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'provider' })
-useHead({ title: 'Moje opinie — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('provider.reviews.metaTitle') })
 </script>
 
 <template>
   <AppPagePlaceholder
-    title="Moje opinie"
+    :title="$t('provider.reviews.placeholderTitle')"
     icon="i-lucide-star"
-    description="Opinie wystawione Tobie jako pracownikowi firmy. Wkrótce."
+    :description="$t('provider.reviews.placeholderDescription')"
   />
 </template>

@@ -9,6 +9,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['saved'])
 
+const { t } = useI18n()
+const { apiErrorMessage } = useApiError()
 const authFetch = useAuthFetch()
 const toast = useToast()
 
@@ -31,10 +33,10 @@ async function save() {
         languages: form.languages
       }
     })
-    toast.add({ title: 'Zapisano profil.', color: 'success' })
+    toast.add({ title: t('provider.staffForm.saved'), color: 'success' })
     emit('saved')
   } catch (e) {
-    toast.add({ title: e?.statusMessage || 'Nie udało się zapisać.', color: 'error' })
+    toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
   } finally {
     saving.value = false
   }
@@ -52,8 +54,8 @@ async function save() {
     />
 
     <UFormField
-      label="Krótki opis"
-      hint="przy nazwisku, do 160 znaków"
+      :label="$t('provider.staffForm.shortDescription')"
+      :hint="$t('provider.staffForm.shortDescriptionHint')"
     >
       <UInput
         v-model="form.shortDescription"
@@ -63,8 +65,8 @@ async function save() {
     </UFormField>
 
     <UFormField
-      label="Pełny opis"
-      hint="rozwijany „pokaż więcej”"
+      :label="$t('provider.staffForm.longDescription')"
+      :hint="$t('provider.staffForm.longDescriptionHint')"
     >
       <UTextarea
         v-model="form.longDescription"
@@ -74,20 +76,20 @@ async function save() {
       />
     </UFormField>
 
-    <UFormField label="Języki">
+    <UFormField :label="$t('provider.staffForm.languages')">
       <USelectMenu
         v-model="form.languages"
         :items="LANGUAGES"
         value-key="value"
         multiple
         class="w-full"
-        placeholder="Wybierz języki"
+        :placeholder="$t('provider.staffForm.languagesPlaceholder')"
       />
     </UFormField>
 
     <div class="flex justify-end">
       <UButton
-        label="Zapisz"
+        :label="$t('common.actions.save')"
         color="primary"
         icon="i-lucide-check"
         :loading="saving"

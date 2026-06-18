@@ -39,7 +39,7 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
+  const orgId = getRequiredParam(event, 'orgId')
   await requireOrgRole(event, orgId, ['owner'])
 
   const db = adminDb()
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
   // Owner first, then by status (active, invited, pending).
   const order = { active: 0, invited: 1, pending: 2 } as Record<string, number>
   members.sort((a, b) =>
-    (a.role === 'owner' ? -1 : b.role === 'owner' ? 1 : 0) || (order[a.status] - order[b.status])
+    (a.role === 'owner' ? -1 : b.role === 'owner' ? 1 : 0) || ((order[a.status] ?? 0) - (order[b.status] ?? 0))
   )
 
   return { members }

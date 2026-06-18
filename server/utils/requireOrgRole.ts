@@ -32,7 +32,7 @@ export async function requireOrgRole(
 
   const doc = snap.docs[0]
   if (!doc || !roles.includes(doc.get('role'))) {
-    throw createError({ statusCode: 403, statusMessage: 'Brak uprawnień w tej organizacji.' })
+    throw apiError(403, 'errors.api.org.forbidden')
   }
 
   return {

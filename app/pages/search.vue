@@ -1,8 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'app', context: 'public' })
-useHead({ title: 'Szukaj — DogLife' })
+const { t } = useI18n()
+useHead({ title: t('opiekun.search.metaTitle') })
 </script>
 
 <template>
-  <AppPagePlaceholder title="Szukaj usług" icon="i-lucide-search" description="Wyszukiwarka z filtrami, lokalizacją i rankingiem (Faza C planu UI)." />
+  <AppPagePlaceholder
+    :title="$t('opiekun.search.title')"
+    icon="i-lucide-search"
+    :description="$t('opiekun.search.description')"
+  />
 </template>

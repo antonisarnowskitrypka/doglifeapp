@@ -26,8 +26,8 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const orgId = getRouterParam(event, 'orgId')
-  const membershipId = getRouterParam(event, 'membershipId')
+  const orgId = getRequiredParam(event, 'orgId')
+  const membershipId = getRequiredParam(event, 'membershipId')
   const { memberRef } = await requireMemberEdit(event, orgId, membershipId)
 
   const { buffer, contentType } = await readUploadedImage(event)
