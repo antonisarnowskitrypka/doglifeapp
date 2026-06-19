@@ -11,7 +11,7 @@ const { apiErrorMessage } = useApiError()
 const orgId = computed(() => ctx.activeContext.membership?.organizationId)
 const isOwner = computed(() => ctx.activeContext.membership?.role === 'owner')
 
-const categoryItems = SERVICE_CATEGORIES.map(c => ({ label: c.label, value: c.key, icon: c.icon }))
+const categoryItems = SERVICE_CATEGORIES.map(c => ({ label: c.label, value: c.key, icon: c.icon, color: c.color }))
 const speciesItems = SPECIES.map(s => ({ label: s.label, value: s.key }))
 
 const org = ref(null)
@@ -120,12 +120,10 @@ async function save() {
           </UFormField>
 
           <UFormField :label="$t('provider.profile.categories')">
-            <USelectMenu
+            <CategorySelect
               v-model="form.categoryKeys"
               :items="categoryItems"
-              value-key="value"
               multiple
-              class="w-full"
             />
           </UFormField>
 

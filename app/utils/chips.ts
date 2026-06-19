@@ -45,6 +45,32 @@ export const STAFF_COLORS: ChipColor[] = COLORS
 const COLOR_MAP = new Map(COLORS.map(c => [c.key, c]))
 const FALLBACK_CHIP = 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300'
 
+/**
+ * Outlined variant (border + text, no fill) — used for main service-category chips (28-service-categories.md).
+ * Literal classes so Tailwind v4 generates them; keyed by the same color names as COLORS.
+ */
+const OUTLINE: Record<string, string> = {
+  teal: 'border border-teal-300 text-teal-700 dark:border-teal-800 dark:text-teal-300',
+  blue: 'border border-blue-300 text-blue-700 dark:border-blue-800 dark:text-blue-300',
+  emerald: 'border border-emerald-300 text-emerald-700 dark:border-emerald-800 dark:text-emerald-300',
+  amber: 'border border-amber-300 text-amber-700 dark:border-amber-800 dark:text-amber-300',
+  orange: 'border border-orange-300 text-orange-700 dark:border-orange-800 dark:text-orange-300',
+  rose: 'border border-rose-300 text-rose-700 dark:border-rose-800 dark:text-rose-300',
+  violet: 'border border-violet-300 text-violet-700 dark:border-violet-800 dark:text-violet-300',
+  pink: 'border border-pink-300 text-pink-700 dark:border-pink-800 dark:text-pink-300',
+  cyan: 'border border-cyan-300 text-cyan-700 dark:border-cyan-800 dark:text-cyan-300',
+  slate: 'border border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300',
+  indigo: 'border border-indigo-300 text-indigo-700 dark:border-indigo-800 dark:text-indigo-300',
+  sky: 'border border-sky-300 text-sky-700 dark:border-sky-800 dark:text-sky-300',
+  lime: 'border border-lime-300 text-lime-700 dark:border-lime-800 dark:text-lime-300',
+  fuchsia: 'border border-fuchsia-300 text-fuchsia-700 dark:border-fuchsia-800 dark:text-fuchsia-300',
+  red: 'border border-red-300 text-red-700 dark:border-red-800 dark:text-red-300',
+  green: 'border border-green-300 text-green-700 dark:border-green-800 dark:text-green-300',
+  yellow: 'border border-yellow-300 text-yellow-700 dark:border-yellow-800 dark:text-yellow-300',
+  stone: 'border border-stone-300 text-stone-700 dark:border-stone-700 dark:text-stone-300'
+}
+const FALLBACK_OUTLINE = 'border border-default text-muted'
+
 export interface ChipIcon {
   id: string
   name: string
@@ -73,6 +99,11 @@ export function defaultChipIcon(kind: string): string {
 /** Subtle chip classes for a color key (falls back to teal). */
 export function chipClass(colorKey: string): string {
   return COLOR_MAP.get(colorKey)?.chip ?? FALLBACK_CHIP
+}
+
+/** Outlined chip classes for a color key (border + text, no fill; neutral fallback). */
+export function chipOutlineClass(colorKey: string): string {
+  return OUTLINE[colorKey] ?? FALLBACK_OUTLINE
 }
 
 /** Solid swatch class for a color key (for the picker trigger / dots). */

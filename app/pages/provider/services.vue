@@ -29,7 +29,7 @@ const gates = computed(() => ({
 const anyGate = computed(() => gates.value.online || gates.value.atClient || gates.value.atLocation)
 
 const categoryItems = computed(() =>
-  SERVICE_CATEGORIES.filter(c => (org.value?.categoryKeys || []).includes(c.key)).map(c => ({ label: c.label, value: c.key, icon: c.icon }))
+  SERVICE_CATEGORIES.filter(c => (org.value?.categoryKeys || []).includes(c.key)).map(c => ({ label: c.label, value: c.key, icon: c.icon, color: c.color }))
 )
 const speciesItems = SPECIES.map(s => ({ label: s.label, value: s.key }))
 const activeStaff = computed(() => staff.value.filter(m => m.status === 'active'))
@@ -96,12 +96,12 @@ const servicesByCategory = computed(() => {
   const groups = []
   for (const c of categoryItems.value) {
     const items = services.value.filter(s => s.categoryKey === c.value)
-    if (items.length) groups.push({ key: c.value, label: c.label, icon: c.icon, items })
+    if (items.length) groups.push({ key: c.value, label: c.label, icon: c.icon, color: c.color, items })
   }
   // A service whose category the org no longer offers still shows, under an "other" bucket.
   const known = new Set(categoryItems.value.map(c => c.value))
   const orphans = services.value.filter(s => !known.has(s.categoryKey))
-  if (orphans.length) groups.push({ key: '_other', label: t('provider.services.otherGroup'), icon: 'i-lucide-tag', items: orphans })
+  if (orphans.length) groups.push({ key: '_other', label: t('provider.services.otherGroup'), icon: 'i-lucide-tag', color: '', items: orphans })
   return groups
 })
 
@@ -465,12 +465,14 @@ async function doDeletePkg() {
         :key="group.key"
         class="space-y-2"
       >
-        <h2 class="flex items-center gap-2 text-sm font-semibold text-muted uppercase tracking-wide">
-          <UIcon
-            :name="group.icon"
-            class="size-4"
+        <h2>
+          <AppChip
+            :color="group.color"
+            :icon="group.icon"
+            :label="group.label"
+            variant="outline"
+            size="lg"
           />
-          {{ group.label }}
         </h2>
 
         <div
@@ -712,11 +714,9 @@ async function doDeletePkg() {
           </UFormField>
 
           <UFormField :label="$t('provider.services.form.category')">
-            <USelectMenu
+            <CategorySelect
               v-model="svForm.categoryKey"
               :items="categoryItems"
-              value-key="value"
-              class="w-full"
             />
           </UFormField>
 

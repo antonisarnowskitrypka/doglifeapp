@@ -23,6 +23,11 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
 
 export const CATEGORY_KEYS = SERVICE_CATEGORIES.map(c => c.key)
 
+/** Resolve a main service category by key (for category chips/icons). */
+export function serviceCategory(key: string): ServiceCategory | undefined {
+  return SERVICE_CATEGORIES.find(c => c.key === key)
+}
+
 export const SPECIES = [
   { key: 'dog', label: 'Psy' },
   { key: 'cat', label: 'Koty' }

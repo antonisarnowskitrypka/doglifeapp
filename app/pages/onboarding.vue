@@ -7,7 +7,7 @@ const ctx = useContextStore()
 const authFetch = useAuthFetch()
 const { apiErrorMessage } = useApiError()
 
-const categoryItems = SERVICE_CATEGORIES.map(c => ({ label: c.label, value: c.key, icon: c.icon }))
+const categoryItems = SERVICE_CATEGORIES.map(c => ({ label: c.label, value: c.key, icon: c.icon, color: c.color }))
 const speciesItems = SPECIES.map(s => ({ label: s.label, value: s.key }))
 
 const state = reactive({
@@ -77,13 +77,11 @@ async function onSubmit() {
         required
         :hint="$t('onboarding.fields.categoriesHint')"
       >
-        <USelectMenu
+        <CategorySelect
           v-model="state.categoryKeys"
           :items="categoryItems"
-          value-key="value"
           multiple
           :placeholder="$t('onboarding.fields.categoriesPlaceholder')"
-          class="w-full"
         />
       </UFormField>
 

@@ -3,8 +3,12 @@ definePageMeta({ layout: 'app', context: 'provider' })
 const { t } = useI18n()
 useHead({ title: t('provider.settingsHub.metaTitle') })
 
+const ctx = useContextStore()
+const isOwner = computed(() => ctx.activeContext.membership?.role === 'owner')
+
 // Provider "Więcej" hub (mobile) — mirrors the desktop side-rail submenus.
 // `ready: false` shows a "wkrótce" badge; the target page is a placeholder either way.
+// `ownerOnly` sections (company settings) are hidden for staff.
 const sections = computed(() => [
   {
     title: t('nav.myCard.title'),
@@ -15,6 +19,7 @@ const sections = computed(() => [
   },
   {
     title: t('nav.companySettings.title'),
+    ownerOnly: true,
     links: [
       { label: t('nav.companySettings.profile'), description: t('provider.settingsHub.companyProfileDescription'), icon: 'i-lucide-store', to: '/provider/profile', ready: true },
       { label: t('nav.companySettings.staff'), description: t('provider.settingsHub.staffDescription'), icon: 'i-lucide-users', to: '/provider/staff', ready: true },
@@ -30,7 +35,7 @@ const sections = computed(() => [
       { label: t('nav.appSettings.appearance'), description: t('provider.settingsHub.appearanceDescription'), icon: 'i-lucide-sun-moon', to: '/app-settings/appearance', ready: true }
     ]
   }
-])
+].filter(section => !section.ownerOnly || isOwner.value))
 </script>
 
 <template>

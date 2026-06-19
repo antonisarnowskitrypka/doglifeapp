@@ -5,6 +5,8 @@ interface NavItemDef {
   to?: string
   children?: NavItemDef[]
   defaultOpen?: boolean
+  /** Owner-only branch (e.g. company settings) — hidden for staff. */
+  ownerOnly?: boolean
 }
 
 export interface NavItem {
@@ -92,6 +94,7 @@ const PROVIDER_DESKTOP: NavItemDef[][] = [
       labelKey: 'nav.companySettings.title',
       icon: 'i-lucide-building-2',
       defaultOpen: true,
+      ownerOnly: true,
       children: [
         { labelKey: 'nav.companySettings.profile', icon: 'i-lucide-store', to: '/provider/profile' },
         { labelKey: 'nav.companySettings.staff', icon: 'i-lucide-users', to: '/provider/staff' },
@@ -102,6 +105,13 @@ const PROVIDER_DESKTOP: NavItemDef[][] = [
     APP_SETTINGS
   ]
 ]
+
+/** Drop owner-only branches when the member isn't an owner (recurses into children). */
+function visibleFor(items: NavItemDef[], isOwner: boolean): NavItemDef[] {
+  return items
+    .filter(item => !item.ownerOnly || isOwner)
+    .map(item => (item.children ? { ...item, children: visibleFor(item.children, isOwner) } : item))
+}
 
 /** Resolve `labelKey` → translated `label`, recursing into submenu children. */
 function localize(items: NavItemDef[], t: (key: string) => string): NavItem[] {
@@ -118,10 +128,15 @@ export function useNavigation() {
   const { t } = useI18n()
   const ctx = useContextStore()
   const isProvider = computed(() => ctx.activeContext.type === 'org')
+  const isOwner = computed(() => ctx.activeContext.membership?.role === 'owner')
 
-  const mobileItems = computed<NavItem[]>(() => localize(isProvider.value ? PROVIDER_MOBILE : OPIEKUN_MOBILE, t))
+  const mobileItems = computed<NavItem[]>(() =>
+    localize(visibleFor(isProvider.value ? PROVIDER_MOBILE : OPIEKUN_MOBILE, isOwner.value), t)
+  )
   const desktopGroups = computed<NavItem[][]>(() =>
-    (isProvider.value ? PROVIDER_DESKTOP : OPIEKUN_DESKTOP).map(group => localize(group, t))
+    (isProvider.value ? PROVIDER_DESKTOP : OPIEKUN_DESKTOP)
+      .map(group => localize(visibleFor(group, isOwner.value), t))
+      .filter(group => group.length)
   )
 
   return { mobileItems, desktopGroups }
