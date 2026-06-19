@@ -20,6 +20,13 @@ Cross-cutting rules every collection and server route follows. The foundation fo
 - Slot generation, availability, and date-based search are computed in the org's time zone, then stored/compared in UTC.
 - **DST handled** via IANA zones. Target region for now: Europe (UK → Bulgaria), but the model is global.
 
+## Geo / Coordinates
+
+- Coordinates are stored as plain `{ lat, lng }` decimal degrees (**WGS84**, ≤ **6 decimal places** ≈ 0.1 m), **never** a Firestore `GeoPoint` — we query geographically via H3 + haversine, not native geo, so plain numbers stay JSON-clean across the Admin SDK ↔ route ↔ SSR boundary.
+- Country is stored as `countryCode` (**ISO 3166-1 alpha-2**, e.g. `PL`, `GB`, `BG`).
+- Addresses are turned into coordinates **server-side only** (secret key); clients never call a geocoder directly. Geocoded results are **denormalized-and-documented**: the source of truth is the provider-confirmed `location`, recomputed when its `address` changes. Full spec: [Geocoding & Maps](./36-geocoding-and-maps.md).
+- `geocode.precision` (`rooftop | street | postcode | city | approximate | manual`) and `geoStatus` (`pending | ok | low_confidence | failed`) are lower_snake_case enums (see [Enums](#enums)).
+
 ## Identifiers
 
 - Document IDs are server-generated opaque strings (Firestore auto-IDs or UUIDs). Never embed business meaning in IDs.

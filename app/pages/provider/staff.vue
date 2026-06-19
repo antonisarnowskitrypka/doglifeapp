@@ -169,6 +169,7 @@ function onMemberSaved() {
             class="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
           >
             <UAvatar
+              :src="m.avatarUrl || undefined"
               :alt="m.displayName || m.email"
               :icon="m.role === 'owner' ? 'i-lucide-crown' : 'i-lucide-user'"
               size="sm"
@@ -180,6 +181,10 @@ function onMemberSaved() {
               <p class="text-xs text-muted truncate">
                 {{ m.email }}
               </p>
+              <LanguageFlags
+                :codes="m.languages"
+                class="mt-1"
+              />
             </div>
             <UBadge
               :label="m.role === 'owner' ? $t('provider.staff.roleOwner') : $t('provider.staff.roleStaff')"
@@ -228,7 +233,8 @@ function onMemberSaved() {
             shortDescription: editing.shortDescription,
             longDescription: editing.longDescription,
             languages: editing.languages,
-            avatarUrl: editing.avatarUrl
+            avatarUrl: editing.avatarUrl,
+            color: editing.color
           }"
           @saved="onMemberSaved"
         />

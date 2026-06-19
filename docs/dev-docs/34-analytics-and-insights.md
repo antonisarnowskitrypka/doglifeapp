@@ -15,7 +15,7 @@ This doc **supersedes** the earlier "no event-tracking pipeline in MVP" note in 
 
 ### `analyticsEvents` (append-only, raw)
 
-Top-level collection, write-only sink. No PII beyond opaque IDs; `userCell` is a coarse H3 cell (search resolution), not a precise locator.
+Top-level collection, write-only sink. No PII beyond opaque IDs; `userCell` is a coarse H3 cell (search resolution), not a precise locator. Precise coordinates — e.g. a booking's `serviceLocation` for `at_client` (see [Geocoding & Maps](./36-geocoding-and-maps.md)) — are **never** emitted here; only the coarse `userCell` ever enters analytics.
 
 ```
 id: string

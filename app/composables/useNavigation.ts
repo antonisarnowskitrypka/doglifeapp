@@ -95,8 +95,8 @@ const PROVIDER_DESKTOP: NavItemDef[][] = [
       children: [
         { labelKey: 'nav.companySettings.profile', icon: 'i-lucide-store', to: '/provider/profile' },
         { labelKey: 'nav.companySettings.staff', icon: 'i-lucide-users', to: '/provider/staff' },
-        { labelKey: 'nav.companySettings.services', icon: 'i-lucide-list', to: '/provider/services' },
-        { labelKey: 'nav.companySettings.locations', icon: 'i-lucide-map-pin', to: '/provider/locations' }
+        { labelKey: 'nav.companySettings.locations', icon: 'i-lucide-map-pin', to: '/provider/locations' },
+        { labelKey: 'nav.companySettings.services', icon: 'i-lucide-list', to: '/provider/services' }
       ]
     },
     APP_SETTINGS

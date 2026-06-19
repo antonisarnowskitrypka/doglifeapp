@@ -7,7 +7,7 @@ The public, SEO-indexed provider page is organised into three tabs:
 | Tab | Content | Source |
 |---|---|---|
 | SERVICES | List of services, each linking into the booking flow | `services` for the org |
-| ABOUT | Company details, description, reviews, certificates, public equipment | org profile, `reviews`, public `equipment` |
+| ABOUT | Company details, description, reviews, certificates, public equipment, location static map | org profile, `reviews`, public `equipment`, `location` |
 | CHAT | General pre-booking client–provider conversation | `conversations` (see below) |
 
 SERVICES and ABOUT are server-rendered for SEO. CHAT is interactive (auth-gated for sending).
@@ -30,6 +30,8 @@ ownerId: string
 ```
 
 A staff member's public presentation comes from their `organizationMembers` blurb (`shortDescription`/`longDescription`), `languages`, and org-scoped `avatarUrl` (falling back to the person's `users.avatarUrl`) — see [Accounts & Membership](./20-accounts-and-membership.md).
+
+The operational **location** (a geocoded address, distinct from the invoice `companyDetails.address`) is specified in [Geocoding & Maps](./36-geocoding-and-maps.md). The ABOUT tab renders that location's **static map**: an exact pin for public business locations, an **approximate-area** map (exact address hidden) for home-based providers (`location.isPublic == false`).
 
 ## Chat Model
 

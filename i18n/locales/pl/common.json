@@ -8,6 +8,8 @@
       "save": "Zapisz",
       "cancel": "Anuluj",
       "delete": "Usuń",
+      "edit": "Edytuj",
+      "add": "Dodaj",
       "back": "Wstecz",
       "close": "Zamknij",
       "retry": "Spróbuj ponownie",
@@ -18,8 +20,29 @@
     "labels": {
       "optional": "opcjonalne",
       "or": "lub",
+      "from": "od",
       "soon": "wkrótce",
       "account": "Konto"
+    },
+    "colors": {
+      "teal": "Morski",
+      "blue": "Niebieski",
+      "emerald": "Szmaragdowy",
+      "amber": "Bursztynowy",
+      "orange": "Pomarańczowy",
+      "rose": "Różany",
+      "violet": "Fioletowy",
+      "pink": "Różowy",
+      "cyan": "Cyjan",
+      "slate": "Grafitowy",
+      "indigo": "Indygo",
+      "sky": "Błękitny",
+      "lime": "Limonkowy",
+      "fuchsia": "Fuksja",
+      "red": "Czerwony",
+      "green": "Zielony",
+      "yellow": "Żółty",
+      "stone": "Kamienny"
     },
     "roles": {
       "opiekun": "OPIEKUN",

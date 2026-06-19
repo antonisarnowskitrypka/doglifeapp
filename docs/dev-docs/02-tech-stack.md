@@ -46,6 +46,16 @@ Card storage is not implemented in MVP.
 | Email | Resend |
 | In-app | Firestore-backed |
 
+## Geocoding & Maps
+
+| Concern | Tool |
+|---|---|
+| Geocoding + address autocomplete | Geoapify (server-side; LocationIQ fallback) |
+| Static maps | Geoapify Static Maps (server-proxied image) |
+| Geospatial index | `h3-js` ^4 (H3, `RES = 6`) — installed; shared math in `shared/utils/geo.ts`, server helpers in `server/utils/h3.ts` |
+
+Server-side only (secret key `GEOAPIFY_API_KEY`). **Static map images only — no dynamic/interactive maps in MVP** (live previews re-render a debounced static image). Built behind a swappable adapter (`server/utils/geocode.ts`); the org configures delivery on `/provider/locations`. See [Geocoding & Maps](./36-geocoding-and-maps.md).
+
 ## API
 
 | Concern | Tool |

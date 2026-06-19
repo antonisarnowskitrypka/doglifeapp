@@ -101,7 +101,8 @@ export default defineEventHandler(async (event) => {
       shortDescription: data.shortDescription ?? null,
       longDescription: data.longDescription ?? null,
       languages: data.languages ?? [],
-      avatarUrl: data.avatarUrl ?? null
+      avatarUrl: data.avatarUrl ?? null,
+      color: data.color ?? null
     }
   }))
 

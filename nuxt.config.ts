@@ -73,6 +73,10 @@ export default defineNuxtConfig({
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'pl',
+    // Only `pl` is translated, so DON'T auto-pick the browser language (an English browser would
+    // otherwise boot the empty `en` catalog and show raw keys, persisted in `i18n_redirected`).
+    // Always start in `pl`; the user switches explicitly via /app-settings/language.
+    detectBrowserLanguage: false,
     vueI18n: 'i18n.config.ts',
     langDir: 'locales',
     locales: [
@@ -89,6 +93,7 @@ export default defineNuxtConfig({
           'pl/account.json',
           'pl/appSettings.json',
           'pl/provider.json',
+          'pl/geo.json',
           'pl/onboarding.json',
           'pl/home.json',
           'pl/opiekun.json'

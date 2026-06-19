@@ -1,8 +1,17 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+@import "flag-icons/css/flag-icons.min.css";
 
 /* Colors come from Nuxt UI aliases (primary: teal, neutral: stone) in app.config.ts —
    light/dark are generated, so we don't hand-maintain hex. Keep custom CSS minimal. */
 @theme static {
   --font-sans: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Crop the squared flag-icons (`fis`) into circles. The `.fi` base sets
+   background-size:contain and is unlayered (beats Tailwind utilities), so a
+   two-class rule is the reliable way to override it to cover. */
+.fi.fi-round {
+  border-radius: 9999px;
+  background-size: cover;
 }

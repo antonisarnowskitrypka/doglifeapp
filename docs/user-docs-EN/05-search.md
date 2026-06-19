@@ -46,8 +46,10 @@ Location is ignored. You see all providers offering the given service online. On
 ## Providing your location
 
 You can:
-- Click **"Use my location"** (browser geolocation), or
-- Type an address (with autocomplete suggestions).
+- Click **"Use my location"** (browser geolocation) — most precise, or
+- Type a **city or address** — we convert it to coordinates.
+
+A typed **city** is treated as its **centre**, so results are "around" that city; for the most precise match, use GPS location.
 
 ## Cross-category autocomplete
 

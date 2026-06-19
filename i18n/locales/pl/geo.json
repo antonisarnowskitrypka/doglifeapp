@@ -1,0 +1,23 @@
+{
+  "geo": {
+    "precision": {
+      "rooftop": "Dokładny adres",
+      "street": "Ulica",
+      "postcode": "Kod pocztowy",
+      "city": "Miasto / obszar",
+      "approximate": "Przybliżony",
+      "manual": "Współrzędne ręczne"
+    },
+    "status": {
+      "pending": "Do zlokalizowania",
+      "ok": "Zlokalizowano",
+      "low_confidence": "Sprawdź dokładność",
+      "failed": "Nie znaleziono"
+    },
+    "map": {
+      "alt": "Mapa lokalizacji",
+      "unavailable": "Podgląd mapy niedostępny",
+      "approximate": "Pokazujemy przybliżoną okolicę"
+    }
+  }
+}

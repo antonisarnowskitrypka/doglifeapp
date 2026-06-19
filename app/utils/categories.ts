@@ -41,3 +41,25 @@ export const LANGUAGES = [
   { value: 'it', label: 'Italiano' },
   { value: 'cs', label: 'Čeština' }
 ]
+
+/**
+ * Language code → ISO 3166-1 alpha-2 country code, for flag display. A language is not a
+ * country, so several differ (English→GB, Ukrainian→UA, Czech→CZ). Used by LanguageFlags.vue.
+ */
+export const LANGUAGE_COUNTRY: Record<string, string> = {
+  pl: 'pl',
+  en: 'gb',
+  de: 'de',
+  uk: 'ua',
+  ru: 'ru',
+  bg: 'bg',
+  es: 'es',
+  fr: 'fr',
+  it: 'it',
+  cs: 'cz'
+}
+
+/** Human label for a language code (falls back to the code itself). */
+export function languageLabel(code: string): string {
+  return LANGUAGES.find(l => l.value === code)?.label ?? code
+}

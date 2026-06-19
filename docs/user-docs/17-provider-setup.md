@@ -70,9 +70,19 @@ Każdą usługę można ustawić na jeden z trzech trybów:
 
 Petsitting domyślnie działa w trybie INQUIRY. Szczegóły przepływów: [Cykl życia rezerwacji](./10-booking-lifecycle.md).
 
-## Lokacje
+## Lokalizacje i dojazd
 
-Organizacja może mieć kilka lokacji (np. studio plus obiekt partnerski). Każda lokacja ma nazwę i adres. Usługi są powiązane z lokacją (lokacjami), w których są świadczone.
+Na ekranie **„Lokalizacje i dojazd"** ustalasz — raz dla całej firmy — jak realizujesz usługi, trzema przełącznikami:
+
+- **Online (zdalnie)** — konsultacje przez internet, bez lokalizacji.
+- **Dojazd do klienta** — podajesz **jeden adres bazowy** i **promień dojazdu** (suwak); pokazujemy podgląd zasięgu na statycznej mapce. Tylko klienci w tym promieniu znajdą Cię w wyszukiwaniu „Mój dom".
+- **Lokacje** — miejsca, do których przychodzą klienci. Możesz dodać ich kilka:
+  - **adres** (np. gabinet, sala) — z własną nazwą i opcjonalnym zdjęciem,
+  - **„w terenie”** — luźny obszar (miasto / okolica), gdy umawiasz się np. w parku; ustawiasz zasięg obszaru, a publicznie pokazujemy tylko przybliżoną okolicę.
+
+Po wpisaniu adresu zamieniamy go na punkt na mapie i pokazujemy **podgląd statycznej mapki** do potwierdzenia. **Lokacja musi zostać poprawnie zlokalizowana, zanim jej usługi pojawią się w wyszukiwaniu.** Jeśli pracujesz z domu, możesz **ukryć dokładny adres** — publicznie pokażemy tylko przybliżoną okolicę. Gdyby adresu nie udało się odnaleźć (np. nowe osiedle, teren wiejski), możesz wpisać współrzędne ręcznie.
+
+To są ustawienia **wspólne dla firmy** — w każdej usłudze wybierasz potem, których z włączonych trybów używa (i w których lokacjach jest świadczona).
 
 ## Tryby realizacji per usługa
 
@@ -83,7 +93,7 @@ Każda usługa jest oferowana w jednym lub kilku trybach realizacji — to decyd
 | Tryb | Konfiguracja |
 |---|---|
 | **W lokacji** | Powiąż usługę z jedną lub kilkoma swoimi lokacjami. |
-| **U klienta w domu** | Włącz usługę dojazdową i ustaw **promień dojazdu** (w km od wybranej lokacji bazowej). Tylko klienci w tym promieniu znajdą usługę w wyszukiwaniu „Mój dom". |
+| **U klienta w domu** | Włącz dojazd w usłudze. Adres bazowy i **promień dojazdu** są wspólne dla firmy (ustawiasz je raz na ekranie „Lokalizacje i dojazd"). Tylko klienci w tym promieniu znajdą usługę w wyszukiwaniu „Mój dom". |
 | **Online** | Włącz per usługa. Przeznaczone dla konsultacji (trening, behawiorystyka, dietetyka). |
 
 Usługa może łączyć tryby (np. konsultacja dostępna online i w lokacji).

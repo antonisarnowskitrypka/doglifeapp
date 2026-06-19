@@ -29,6 +29,9 @@ Recorded as one-liners — design discussion happens before any of these are mod
 
 - **Full-text search** — Firestore-only MVP has no tokenization / fuzzy / relevance ranking; add an external engine (Typesense / Meilisearch / Algolia) synced from Firestore as an additive step (see [Search](./13-search.md)).
 - **Dual-species "More" menu placement** — alternative location for the species selector for dual-species owners (see [Search](./13-search.md)).
+- **Dynamic / interactive maps** — MVP shows static map images only; interactive tiles, panning, and pin-drop are parked (see [Geocoding & Maps](./36-geocoding-and-maps.md)).
+- **Searcher address autocomplete** — provider location setup uses autocomplete; searcher input is free-text + GPS in MVP (see [Geocoding & Maps](./36-geocoding-and-maps.md)).
+- **Reverse-geocode "near {city}" label** — "use my location" uses GPS coordinates directly in MVP; a reverse-geocoded label is parked (see [Geocoding & Maps](./36-geocoding-and-maps.md)).
 
 ### Pets, health & Life of Pet
 

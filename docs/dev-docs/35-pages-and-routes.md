@@ -19,7 +19,7 @@ Each page declares a **scope** via `definePageMeta({ context })`, enforced by th
 ## Public
 - `/` — **app dashboard**: Opiekun pulpit when logged in; login/register invite for anonymous (Szukaj + Ustawienia usable). **[public]**
 - `/search` — marketplace search results. **[public, SEO later]**
-- `/p/[orgSlug]` — provider public profile (Services / About / Chat). **[SEO]**
+- `/p/[orgSlug]` — provider public profile (Services / About / Chat); About shows the location on a **static map** (approximate for home-based providers — see [Geocoding & Maps](./36-geocoding-and-maps.md)). **[SEO]**
 - `/courses/[slug]` — course landing + curriculum. **[SEO]**
 - `/events/[slug]` — single event landing. **[SEO]**
 - `/series/[slug]` — recurring event-series landing. **[SEO]**
@@ -50,7 +50,8 @@ Each page declares a **scope** via `definePageMeta({ context })`, enforced by th
 - `/provider/bookings` — bookings inbox.
 - `/provider/bookings/[id]` — booking detail + session workspace.
 - `/provider/clients` — client list (+ ban).
-- `/provider/services` — services CRUD + staff↔service.
+- `/provider/services` — **single-service** CRUD (NOT events/courses/packages): name, category (within the org's), description, species, duration, per-mode delivery+pricing (gated by `organization.delivery`), booking mode, staff assignment (data-only for now), visibility. Precomputes `searchCells` on save. Owner-only. See [Search → service](./13-search.md#delivery-model).
+- `/provider/locations` — **locations & delivery**: the three org-level delivery gates (online / travel-to-client / locations), the single shared travel base + radius (with a debounced static-map reach preview), and the location list — `fixed` venues and `area` ("in the field") entries, each with address autocomplete, optional photo, manual-coordinate fallback, and a confirm + static-map preview. A location must geocode (`geoStatus == 'ok'`) before its services are findable. Owner-only (staff see a read-only notice). See [Locations & Delivery UI](../ui-docs/03-locations-and-delivery.md) + [Geocoding & Maps](./36-geocoding-and-maps.md).
 - `/provider/staff` — staff & permissions.
 - `/provider/packages` — packages & courses management.
 - `/provider/events` — events & recurring series.

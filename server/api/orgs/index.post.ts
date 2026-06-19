@@ -84,6 +84,7 @@ export default defineEventHandler(async (event) => {
     acceptedSpecies,
     ownerId: decoded.uid,
     timezone: 'Europe/Warsaw',
+    currency: 'PLN', // ISO 4217; one currency per org (see dev-docs/00-conventions.md)
     createdAt: FieldValue.serverTimestamp()
   })
   batch.set(memberRef, {

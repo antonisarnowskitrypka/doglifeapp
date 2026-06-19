@@ -46,8 +46,10 @@ Lokalizacja jest ignorowana. Widzisz wszystkich usługodawców oferujących dan�
 ## Podawanie lokalizacji
 
 Możesz:
-- Kliknąć **„Użyj mojej lokalizacji"** (geolokalizacja przeglądarki), albo
-- Wpisać adres (z podpowiedziami autouzupełniania).
+- Kliknąć **„Użyj mojej lokalizacji"** (geolokalizacja przeglądarki) — najdokładniej, albo
+- Wpisać **miasto lub adres** — zamienimy je na współrzędne.
+
+Wpisane **miasto** traktujemy jako jego **centrum**, więc wyniki są „w okolicy" tego miasta; po najdokładniejsze dopasowanie użyj lokalizacji GPS.
 
 ## Autouzupełnianie między kategoriami
 

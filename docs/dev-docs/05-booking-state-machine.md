@@ -29,6 +29,24 @@ Full status list:
 | `late_cancelled_consumed` | Cancelled outside free window — session consumed |
 | `no_show` | Customer did not appear |
 
+## Service Location (`at_client`)
+
+When `deliveryMode === 'at_client'` (travel-to-client), the booking carries the client's delivery address + precise coordinates, geocoded at booking time (see [Geocoding & Maps](./36-geocoding-and-maps.md)):
+
+```
+serviceLocation: {
+  address: string
+  lat: number                  // PRECISE client coordinates
+  lng: number
+  h3: string                   // at RES — for travelRadiusKm re-validation, NOT analytics
+  city: string | null
+  postalCode: string | null
+  countryCode: string
+} | null                       // null for at_location / online
+```
+
+**Sensitive PII.** Visible only to the assigned provider/staff and the customer; never indexed; **never emitted to analytics** ([Analytics](./34-analytics-and-insights.md) keeps only the coarse `userCell`). Used for provider navigation and to re-validate the service's `travelRadiusKm`. Part of the (parked) GDPR-erasure surface (see [Terms & GDPR](./21-terms-and-gdpr.md)).
+
 ## Service Completion (confirmation window)
 
 After the service end time, a booking enters a **24-hour confirmation window**:

@@ -38,7 +38,7 @@ async function waitForEmulators() {
   const deadline = Date.now() + STARTUP_TIMEOUT_MS
   while (Date.now() < deadline) {
     if (await probe(PROBE_HOST, PROBE_PORT)) return true
-    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS))
+    await new Promise(r => setTimeout(r, POLL_INTERVAL_MS))
   }
   return false
 }
@@ -85,7 +85,7 @@ if (await probe(PROBE_HOST, PROBE_PORT)) {
         console.error(`✗ Firebase emulators exited (code ${code ?? 'unknown'}).`)
         shutdown(code ?? 1)
       }
-    }),
+    })
   )
 
   if (!(await waitForEmulators())) {
@@ -95,4 +95,4 @@ if (await probe(PROBE_HOST, PROBE_PORT)) {
   console.log('✓ Firebase emulators ready.')
 }
 
-children.push(spawnProcess('nuxt', ['dev'], (code) => shutdown(code ?? 0)))
+children.push(spawnProcess('nuxt', ['dev'], code => shutdown(code ?? 0)))

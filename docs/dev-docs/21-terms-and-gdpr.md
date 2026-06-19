@@ -47,3 +47,4 @@ if !accepted → require acceptance now, write a policyAcceptances record
 
 - Versioning gives the provider an audit trail of exactly which text each customer agreed to.
 - Policy content can live in Firebase Storage (`contentUrl`) or inline; either way reads/writes go through server routes.
+- **GDPR-erasure surface (parked):** beyond profile/booking data, erasure must cover **precise location PII** — a booking's `serviceLocation.lat/lng` for `at_client` (see [Geocoding & Maps](./36-geocoding-and-maps.md)). Hard erasure/anonymization is parked (see [Conventions](./00-conventions.md), [Roadmap](./33-post-mvp-roadmap.md)).

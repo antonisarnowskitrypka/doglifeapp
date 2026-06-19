@@ -1,3 +1,5 @@
+import { TRAVEL_RADIUS } from '../../../../shared/utils/geo'
+
 defineRouteMeta({
   openAPI: {
     tags: ['Organizations'],
@@ -21,7 +23,10 @@ defineRouteMeta({
                 status: { type: 'string' },
                 categoryKeys: { type: 'array', items: { type: 'string' } },
                 acceptedSpecies: { type: 'array', items: { type: 'string' } },
-                companyDetails: { type: 'object', nullable: true }
+                companyDetails: { type: 'object', nullable: true },
+                currency: { type: 'string', description: 'ISO 4217; one currency per org (see dev-docs/00-conventions.md).' },
+                countryCode: { type: 'string', description: 'ISO 3166-1 alpha-2; biases geocoding (see dev-docs/36).' },
+                delivery: { type: 'object', description: 'Org-level delivery gates + the shared at_client travel base/radius (see dev-docs/13 & 36).' }
               }
             }
           }
@@ -52,6 +57,13 @@ export default defineEventHandler(async (event) => {
     status: d.status ?? 'draft',
     categoryKeys: d.categoryKeys ?? [],
     acceptedSpecies: d.acceptedSpecies ?? [],
-    companyDetails: d.companyDetails ?? null
+    companyDetails: d.companyDetails ?? null,
+    currency: d.currency ?? 'PLN',
+    countryCode: d.countryCode ?? 'PL',
+    delivery: d.delivery ?? {
+      online: { enabled: false },
+      atClient: { enabled: false, travelRadiusKm: TRAVEL_RADIUS.default, base: null },
+      atLocation: { enabled: false }
+    }
   }
 })

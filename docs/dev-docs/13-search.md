@@ -4,19 +4,43 @@ Marketplace search by tags/name, optional date, and delivery mode (online / at c
 
 ## Delivery Model
 
-Every service declares one or more delivery modes. Locations belong to the organization and are linked to services.
+Delivery has **two layers** (see [Geocoding & Maps](./36-geocoding-and-maps.md) and `/provider/locations`):
+
+- **Org-level gates + shared config** (`organization.delivery`): three master switches — `online`, `atClient`, `atLocation` — that declare what the business does at all, plus the **single shared `at_client` travel base + radius** and the org's location list. Configured once on `/provider/locations`.
+- **Per-service opt-in** (`service.deliveryModes`): each service picks which of the *enabled* modes it offers, and which of the org's locations it uses. A service can't offer a mode the org gate has switched off.
+
+### `organization.delivery`
+
+```
+delivery: {
+  online:     { enabled: boolean }
+  atLocation: { enabled: boolean }                 // gate; actual venues live in the `locations` subcollection
+  atClient: {
+    enabled: boolean
+    travelRadiusKm: number                         // the SINGLE org-wide travel radius (was per-service)
+    base: { …geo block… } | null                   // the single travel origin (geocoded; not shown publicly)
+  }
+}
+```
+
+The `at_client` travel base is stored **inline** on the org (one address, one radius — see `/provider/locations`), not as a separate `location` doc.
 
 ### `location` (subcollection of organization)
 
 ```
 id: string
 organizationId: string
-name: string
-address: string
+kind: 'fixed' | 'area'         // fixed address (a venue) | "in the field" area (e.g. meet in a park)
+name: string                   // provider's custom label
+imageUrl: string | null        // optional venue photo
+address: string                // fixed: full address; area: the city/region query
 lat: number
 lng: number
 h3: string                     // H3 index at the fixed search resolution (RES)
+areaRadiusKm: number | null    // area only — provider-defined reach around the centroid
 ```
+
+How `lat/lng/h3` are produced, and the geocoding-related fields on a location (`displayName`, `city`, `postalCode`, `countryCode`, `geocode{…}`, `isPublic`, `geoStatus`, `mapUrl`), are specified in [Geocoding & Maps](./36-geocoding-and-maps.md). An **`area`** location resolves to a **city/region centroid** (precision `city`/`approximate`, always coarse public display) and represents working "in the field" rather than at a fixed venue.
 
 ### `service` — search-relevant fields
 
@@ -32,9 +56,7 @@ atLocation: {
 }
 
 atClient: {
-  enabled: boolean
-  baseLocationId: string       // travel origin
-  travelRadiusKm: number       // provider-defined
+  enabled: boolean             // opt-in only; the travel base + radius are ORG-level (organization.delivery.atClient)
 }
 
 pricing: {                     // per delivery mode; only modes the service offers are set
@@ -49,7 +71,10 @@ languages: string[]            // denormalized org language union (see below)
 species: string[]              // accepted species for this service ('dog' | 'cat') — see Pets
 level: 1 | 2 | 3 | null        // optional advancement level (1 beginner → 3 advanced); null = unspecified
 searchCells: string[]          // precomputed H3 coverage cells (see below)
+status: 'active' | 'hidden'    // only `active` services in an `active` org appear in search
 ```
+
+The full **`service` doc** (subcollection `organizations/{orgId}/services`) also carries the operational fields set by the **single-service creator** at `/provider/services`: `name`, `shortDescription` (always shown next to the name) + `description` (long, behind "show more"), `durationMin` + `operationalBufferMinutes` (the calendar reserves `duration + buffer` per slot — see [Calendar → Operational buffer](./06-calendar-and-availability.md#operational-buffer)), `bookingMode` (`book_now`/`request`/`inquiry` — the **default** only; a calendar window can override it per slot, e.g. weekend = request-only, see [Booking State Machine](./05-booking-state-machine.md)), `paymentMethods` (always includes `online`; `cash` opt-in; more from provider payment settings later), and `staffIds` (who delivers it; data-only until the calendar/availability is built — see [Calendar](./06-calendar-and-availability.md)). The `species` selector is shown only when the org accepts both species; otherwise the single accepted species is implied. `languages` is denormalized as the union of the assigned staff's languages (defaulting to all active members). `searchCells` is precomputed on save — the union of the linked locations' coverage (`at_location`) and the org travel-base coverage (`at_client`); `online`-only services carry no cells. Delivery modes are **gated by `organization.delivery`** (a service can't offer a mode the org has switched off — see [Delivery Model](#delivery-model)). Events, courses and packages are **separate** scheduling types, not built by this creator (see [Service Categories](./28-service-categories.md)).
 
 `level` is an optional product attribute on **`service`** and **`course`** (a plain `packageDefinition` has none — it inherits its service's level). Labels (e.g. *beginner / intermediate / advanced*) are localized client-side from the numeric value.
 
@@ -63,24 +88,27 @@ Firestore has no native geo-radius query, so we precompute H3 cell coverage and 
 
 ### Fixed resolution
 
-A single H3 resolution `RES` is used platform-wide (coarse enough to keep coverage arrays small, e.g. ~res 5). It is a candidate-retrieval bucket only — final distance is always confirmed with haversine, so `RES` affects recall/cost, not accuracy.
+A single H3 resolution **`RES = 6`** (~3.2 km cells) is used platform-wide via [`h3-js`](./36-geocoding-and-maps.md#h3). It is a candidate-retrieval bucket only — final distance is always confirmed with haversine — so `RES` affects recall/cost, not accuracy. RES 6 keeps a 30 km `searchCells` array around ~331 cells; the cell-size↔array-size trade-off and the pin rationale are in [Geocoding & Maps → H3](./36-geocoding-and-maps.md#h3).
 
 ### Precomputing `searchCells`
 
 When a service or location is saved, compute the set of H3 cells covering its reachable area and store them on the searchable document:
 
-- **At a location:** `searchCells = gridDisk(location.h3, ringsFor(30km))` — cells within the fixed 30 km search radius of the location.
-- **At the client's home:** `searchCells = gridDisk(baseLocation.h3, ringsFor(travelRadiusKm))` — cells within the provider's own travel radius.
+- **At a fixed location:** `searchCells = gridDisk(location.h3, ringsFor(30km))` — cells within the fixed 30 km search radius of the venue.
+- **At an `area` location** ("in the field"): `searchCells = gridDisk(location.h3, ringsFor(location.areaRadiusKm))` — the provider-defined reach around the city/region centroid (not the fixed 30 km).
+- **At the client's home:** `searchCells = gridDisk(org.delivery.atClient.base.h3, ringsFor(org.delivery.atClient.travelRadiusKm))` — the org's single shared travel base + radius. Recompute every `at_client` service's cells when that org radius/base changes (see [Geocoding & Maps → Re-geocode triggers](./36-geocoding-and-maps.md#re-geocode-triggers)).
 
-`ringsFor(km)` converts a kilometre radius to an H3 k-ring count at `RES`.
+`ringsFor(km)` converts a kilometre radius to an H3 k-ring count at `RES` — `ceil(km / avgHexEdgeKm(RES)) + 1` (edge-step + safety ring; see [Geocoding & Maps → H3](./36-geocoding-and-maps.md#h3)). It may slightly over-cover, which is harmless because haversine refines.
 
 ### Query
 
-The searcher's point (GPS or geocoded address) is converted to its H3 cell at `RES`:
+The searcher's point — GPS coordinates, or an address/city geocoded server-side (see [Geocoding & Maps](./36-geocoding-and-maps.md)) — is converted to its H3 cell at `RES`:
 
 ```
 userCell = latLngToCell(userLat, userLng, RES)
 ```
+
+A typed **city** geocodes to its centroid before this step — a single-cell approximation that's acceptable given the 30 km disk + haversine refine (see [Geocoding & Maps → City → cell](./36-geocoding-and-maps.md#city--cell-search)). GPS needs no geocoding.
 
 Then a single query per delivery mode:
 
@@ -186,6 +214,6 @@ Firestore does **not** do full-text (no tokenization, fuzzy/typo matching, or re
 
 ## Notes / Tuning
 
-- `RES` and `ringsFor()` are the main tuning knobs. Document any change — it requires recomputing `searchCells` for all services/locations.
+- `RES` and `ringsFor()` are the main tuning knobs (pinned **`RES = 6`** — see [Geocoding & Maps → H3](./36-geocoding-and-maps.md#h3)). Document any change — it requires recomputing `searchCells` for all services/locations.
 - `array-contains-any` is capped at 30 values; keep selected-tag sets within that bound or split queries.
 - Recompute `searchCells` whenever a linked location moves or `travelRadiusKm` changes.

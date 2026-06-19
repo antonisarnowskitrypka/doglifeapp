@@ -70,9 +70,19 @@ Each service can be set to one of three modes:
 
 Petsitting works in INQUIRY mode by default. For flow details: [Booking Lifecycle](./10-booking-lifecycle.md).
 
-## Locations
+## Locations & delivery
 
-An organization can have several locations (e.g. a studio plus a partner facility). Each location has a name and address. Services are linked to the location(s) where they are provided.
+On the **"Locations & delivery"** screen you set — once for the whole business — how you deliver services, via three switches:
+
+- **Online (remote)** — internet consultations, no location.
+- **Travel to the client** — you give a **single base address** and a **travel radius** (slider); we show a static-map preview of the reach. Only clients within that radius find you in a "My home" search.
+- **Locations** — places clients come to. You can add several:
+  - an **address** (e.g. a studio, a room) — with its own name and an optional photo,
+  - **"in the field"** — a loose area (city / neighbourhood) for when you arrange to meet e.g. in a park; you set the area's reach, and publicly we show only an approximate area.
+
+After you enter an address we convert it to a point on the map and show a **static map preview** to confirm. **A location must be correctly located before its services appear in search.** If you work from home, you can **hide the exact address** — publicly we show only an approximate area. If the address can't be found (a new development, a rural area), you can enter coordinates manually.
+
+These are **company-wide** settings — in each service you then choose which of the enabled modes it uses (and at which locations).
 
 ## Delivery modes per service
 
@@ -83,7 +93,7 @@ Each service is offered in one or more delivery modes — this determines how it
 | Mode | Configuration |
 |---|---|
 | **At a location** | Link the service to one or more of your locations. |
-| **At the client's home** | Enable the travel service and set a **travel radius** (in km from a chosen base location). Only clients within that radius will find the service in a "My home" search. |
+| **At the client's home** | Enable travel on the service. The base address and **travel radius** are company-wide (set once on the "Locations & delivery" screen). Only clients within that radius will find the service in a "My home" search. |
 | **Online** | Enable per service. Intended for consultations (training, behaviorism, nutrition). |
 
 A service can combine modes (e.g. a consultation available both online and at a location).

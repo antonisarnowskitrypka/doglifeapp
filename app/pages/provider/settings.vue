@@ -18,15 +18,15 @@ const sections = computed(() => [
     links: [
       { label: t('nav.companySettings.profile'), description: t('provider.settingsHub.companyProfileDescription'), icon: 'i-lucide-store', to: '/provider/profile', ready: true },
       { label: t('nav.companySettings.staff'), description: t('provider.settingsHub.staffDescription'), icon: 'i-lucide-users', to: '/provider/staff', ready: true },
-      { label: t('nav.companySettings.services'), description: t('provider.settingsHub.servicesDescription'), icon: 'i-lucide-list', to: '/provider/services', ready: false },
-      { label: t('nav.companySettings.locations'), description: t('provider.settingsHub.locationsDescription'), icon: 'i-lucide-map-pin', to: '/provider/locations', ready: false }
+      { label: t('nav.companySettings.services'), description: t('provider.settingsHub.servicesDescription'), icon: 'i-lucide-list', to: '/provider/services', ready: true },
+      { label: t('nav.companySettings.locations'), description: t('provider.settingsHub.locationsDescription'), icon: 'i-lucide-map-pin', to: '/provider/locations', ready: true }
     ]
   },
   {
     title: t('nav.appSettings.title'),
     links: [
       { label: t('nav.appSettings.notifications'), description: t('provider.settingsHub.notificationsDescription'), icon: 'i-lucide-bell-ring', to: '/app-settings/notifications', ready: false },
-      { label: t('nav.appSettings.language'), description: t('provider.settingsHub.languageDescription'), icon: 'i-lucide-languages', to: '/app-settings/language', ready: false },
+      { label: t('nav.appSettings.language'), description: t('provider.settingsHub.languageDescription'), icon: 'i-lucide-languages', to: '/app-settings/language', ready: true },
       { label: t('nav.appSettings.appearance'), description: t('provider.settingsHub.appearanceDescription'), icon: 'i-lucide-sun-moon', to: '/app-settings/appearance', ready: true }
     ]
   }

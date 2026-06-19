@@ -29,7 +29,8 @@
         "editForbidden": "Brak uprawnień do edycji tego profilu.",
         "cannotRemoveOwner": "Nie można usunąć właściciela.",
         "invalidEmail": "Podaj prawidłowy adres e-mail.",
-        "alreadyMember": "Ta osoba jest już w zespole lub ma zaproszenie."
+        "alreadyMember": "Ta osoba jest już w zespole lub ma zaproszenie.",
+        "colorTaken": "Ten kolor jest już zajęty przez inną osobę. Wybierz inny."
       },
       "profile": {
         "nameEmpty": "Imię nie może być puste.",
@@ -43,6 +44,23 @@
         "invalidType": "Niedozwolony typ pliku (dozwolone: JPG, PNG, WEBP, HEIC).",
         "tooLarge": "Plik za duży (maks. 10 MB).",
         "noFile": "Brak pliku."
+      },
+      "geo": {
+        "notConfigured": "Geokodowanie jest chwilowo niedostępne. Możesz wpisać współrzędne ręcznie.",
+        "upstream": "Nie udało się połączyć z usługą map. Spróbuj ponownie za chwilę.",
+        "invalidQuery": "Wpisz adres lub miasto.",
+        "invalidCoords": "Nieprawidłowe współrzędne."
+      },
+      "location": {
+        "notFound": "Nie znaleziono lokacji.",
+        "nameRequired": "Podaj nazwę lokacji."
+      },
+      "service": {
+        "notFound": "Nie znaleziono usługi.",
+        "nameRequired": "Podaj nazwę usługi (min. 2 znaki).",
+        "categoryInvalid": "Wybierz kategorię z tych, które oferuje firma.",
+        "deliveryRequired": "Włącz co najmniej jeden tryb realizacji.",
+        "locationRequired": "Wybierz co najmniej jedną lokację dla trybu „W lokacji”."
       }
     }
   }
