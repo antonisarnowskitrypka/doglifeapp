@@ -48,18 +48,49 @@ Which species a provider serves is declared at two levels:
 
 ## Handling Questions
 
-A **platform-defined catalogue** of standard questions (stable keys, localised display): e.g. `is_aggressive`, `attitude_dogs`, `attitude_cats`, `fears`. Providers do **not** define custom questions in MVP — they only choose which catalogue keys their service **requires**.
+A **platform-defined catalogue** of standard questions with **stable keys** and **localised display** (labels/option text live in i18n `handling.json`, never in the data). The catalogue is the single source of truth in [`shared/utils/handling.ts`](../../shared/utils/handling.ts) (`HANDLING_CATALOGUE`) — plain TS so the app auto-imports it and the server imports it relatively (mirrors `shared/utils/geo.ts`).
+
+Each question has an answer `type`:
+
+- **`boolean`** — yes/no. Most carry `detail: true`: when answered "yes" the flow invites an **optional free-text follow-up** (e.g. medication → *which and how often*). Stored as `pets.handling[key]` (boolean) + `pets.handling[key + '_detail']` (string, when given).
+- **`choice`** — single pick from a named **scale** (`SCALES[scale]`). Scales: `attitude` (friendly / neutral / unsure / reactive / aggressive), `tolerance` (calm / tolerates / with_difficulty / stressed / aggressive), `offleash` (yes / conditional / no), `alone` (yes / short / no). Stored as the option key (string).
+- **`text`** — free text. Stored as a string.
+
+Questions are grouped (`social`, `safety`, `health`, `care`, `logistics`, `training`, `guidance`) for the service form, and may be species-scoped (`species: ['dog']`, e.g. `in_heat`).
+
+The MVP catalogue (23 keys): `attitude_people`, `attitude_dogs`, `attitude_children`, `bite_history_human`, `bite_history_dog`, `resource_guarding`, `muzzle`, `medication`, `allergies`, `health_limitations`, `fears`, `in_heat`, `grooming_vet_tolerance`, `handling_rules`, `offleash`, `alone_ok`, `car_travel`, `commands`, `group_experience`, `boarding_experience`, `rewards`, `warnings`, `avoid`.
 
 ### Service requirement
 
+The provider configures a service's **form** in two sections (see [Pages & Routes](./35-pages-and-routes.md) → `/provider/services`):
+
 ```
 // on service
-requiredPetQuestions: string[]   // catalogue keys the customer must answer to book
+requiredPetQuestions: string[]   // catalogue keys the customer must answer to book (subset of the catalogue)
+customQuestions: CustomQuestion[]   // provider-authored, per-booking questions (see below)
 ```
+
+**Section 1 — required handling fields.** The provider ticks which catalogue keys this service **requires**. Validated server-side against `isHandlingKey()`; unknown keys are dropped.
+
+**Section 2 — custom questions** *(new — supersedes the earlier "providers do not define custom questions in MVP" rule)*. The provider authors their own questions whose answers typically **differ every booking, even from the same client** (e.g. *"co chcesz wypracować?"*, *"co Cię do nas sprowadza?"*). Shape:
+
+```
+CustomQuestion {
+  id: string                  // stable per service
+  label: string               // provider's text, stored verbatim (NOT an i18n key)
+  type: 'short_text' | 'long_text' | 'single_choice' | 'multi_choice'
+  options?: string[]          // verbatim, only for the choice types
+  required?: boolean
+}
+```
+
+The two sections differ by **where answers live**: handling answers persist on **`pets.handling`** (reused across bookings — the "90% the same" data); custom answers are captured **per booking** on `booking.customAnswers` (the "90% different" data) and are **not** written back to the pet.
+
+This **form** is strictly *pre-booking intake*. The separate **"Schemat sesji"** action on the same service configures the *post-booking* session blueprint (pre-visit instructions, materials, recommendation/homework/metric templates) — a different object entirely; see [Templates → Schemat sesji](./29-templates.md#entry-point-schemat-sesji-per-service).
 
 ### At booking
 
-For each required key, if `pet.handling[key]` is missing, the booking flow collects it and **persists it onto `pets.handling`**. Already-answered keys are pre-filled. See [Booking a Service](../user-docs/07-booking-a-service.md).
+For each required catalogue key, if `pet.handling[key]` is missing, the booking flow collects it and **persists it onto `pets.handling`** (with the optional `_detail` for boolean questions). Already-answered keys are pre-filled. Custom questions are always asked fresh and stored on `booking.customAnswers: { [questionId]: string | string[] }`. See [Booking a Service](../user-docs/07-booking-a-service.md).
 
 ### Visibility
 

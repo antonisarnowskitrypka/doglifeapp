@@ -24,6 +24,15 @@ A provider can keep several per kind (e.g. multiple note templates, multiple rec
 
 Bound to a **service** or a **package/course**, these auto-set up the session on booking — e.g. the *Konsultacja* service always ships pre-visit prep instructions, while the *Grzeczne Czekanie* course ships learning materials right after purchase.
 
+### Entry point: "Schemat sesji" (per service)
+
+Each service row on [`/provider/services`](./35-pages-and-routes.md) carries two distinct configuration actions, kept separate on purpose:
+
+- **"Edytuj formularz"** → the **pre-booking** intake (required handling fields + custom questions) — see [Pets → Handling Questions](./19-pets.md#handling-questions).
+- **"Schemat sesji"** → this **post-booking** session template. It **predefines the "Session" object** that is instantiated after a booking is made: **pre-visit instructions** (`pre_visit`), **materials** (`material`), and a **template of recommendations / session data / homework** (`recommendation`, `homework`, plus the [metric fields](#session-metric-fields) for structured "data"). It is the provider's reusable blueprint for what every session of that service should contain.
+
+The provider edits one `serviceTemplates` doc per service here; it instantiates per the [trigger](#instantiation-trigger) below into each booking's [session workspace](../user-docs/12-session-workspace.md). **Status:** planned — the "Schemat sesji" button currently ships **disabled** on the services screen until this editor is built.
+
 ### `serviceTemplates`
 
 ```

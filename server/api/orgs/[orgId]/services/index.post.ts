@@ -30,6 +30,22 @@ defineRouteMeta({
               pricing: { type: 'object', description: 'Integer minor units per enabled mode.', properties: { online: { type: 'integer' }, at_client: { type: 'integer' }, at_location: { type: 'integer' } } },
               bookingMode: { type: 'string', enum: ['book_now', 'request', 'inquiry'] },
               staffIds: { type: 'array', items: { type: 'string' }, description: 'Membership ids; empty = all active staff.' },
+              requiredPetQuestions: { type: 'array', items: { type: 'string' }, description: 'Handling-catalogue keys the customer must answer (see shared/utils/handling.ts; unknown keys dropped).' },
+              customQuestions: {
+                type: 'array',
+                description: 'Provider-authored, per-booking questions (answers stored on the booking, not the pet).',
+                items: {
+                  type: 'object',
+                  required: ['label', 'type'],
+                  properties: {
+                    id: { type: 'string' },
+                    label: { type: 'string', maxLength: 200 },
+                    type: { type: 'string', enum: ['short_text', 'long_text', 'single_choice', 'multi_choice'] },
+                    options: { type: 'array', items: { type: 'string' }, description: 'Only for the choice types.' },
+                    required: { type: 'boolean' }
+                  }
+                }
+              },
               status: { type: 'string', enum: ['active', 'hidden'] }
             }
           }

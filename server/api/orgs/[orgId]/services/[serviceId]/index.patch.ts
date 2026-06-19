@@ -31,6 +31,22 @@ defineRouteMeta({
               pricing: { type: 'object', properties: { online: { type: 'integer' }, at_client: { type: 'integer' }, at_location: { type: 'integer' } } },
               bookingMode: { type: 'string', enum: ['book_now', 'request', 'inquiry'] },
               staffIds: { type: 'array', items: { type: 'string' } },
+              requiredPetQuestions: { type: 'array', items: { type: 'string' }, description: 'Handling-catalogue keys the customer must answer.' },
+              customQuestions: {
+                type: 'array',
+                description: 'Provider-authored, per-booking questions.',
+                items: {
+                  type: 'object',
+                  required: ['label', 'type'],
+                  properties: {
+                    id: { type: 'string' },
+                    label: { type: 'string', maxLength: 200 },
+                    type: { type: 'string', enum: ['short_text', 'long_text', 'single_choice', 'multi_choice'] },
+                    options: { type: 'array', items: { type: 'string' } },
+                    required: { type: 'boolean' }
+                  }
+                }
+              },
               status: { type: 'string', enum: ['active', 'hidden'] }
             }
           }

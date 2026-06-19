@@ -6,6 +6,10 @@
  * See [Search → Delivery Model](../docs/dev-docs/13-search.md).
  */
 
+// Relative import: shared/utils auto-imports in the app (Vue) but NOT at Nitro runtime (#shared is type-only).
+import type { CustomQuestion, CustomQuestionType } from '../../shared/utils/handling'
+import { CUSTOM_QUESTION_TYPES, isChoiceQuestion, isHandlingKey } from '../../shared/utils/handling'
+
 export const SERVICE_BOOKING_MODES = ['book_now', 'request', 'inquiry'] as const
 export type ServiceBookingMode = typeof SERVICE_BOOKING_MODES[number]
 
@@ -39,6 +43,8 @@ export interface ServiceDoc {
   bookingMode?: string
   staffIds?: string[]
   languages?: string[]
+  requiredPetQuestions?: string[]
+  customQuestions?: CustomQuestion[]
   status?: string
 }
 
@@ -66,6 +72,8 @@ export function serviceResponse(id: string, d: ServiceDoc) {
     bookingMode: d.bookingMode ?? 'book_now',
     staffIds: d.staffIds ?? [],
     languages: d.languages ?? [],
+    requiredPetQuestions: d.requiredPetQuestions ?? [],
+    customQuestions: d.customQuestions ?? [],
     status: d.status ?? 'active'
   }
 }
@@ -142,6 +150,8 @@ export interface ServiceWriteInput {
   pricing?: { online?: number, at_client?: number, at_location?: number }
   bookingMode?: string
   staffIds?: string[]
+  requiredPetQuestions?: string[]
+  customQuestions?: CustomQuestion[]
   status?: string
 }
 
@@ -156,6 +166,32 @@ function resolvePaymentMethods(body: ServiceWriteInput, prev: ServiceDoc | undef
   const methods = [...new Set(src.filter(m => PAYMENT_METHODS.has(m)))]
   if (!methods.includes('online')) methods.unshift('online')
   return methods
+}
+
+/** Required handling keys, filtered to the platform catalogue (drops unknown keys). */
+function resolveRequiredQuestions(body: ServiceWriteInput, prev: ServiceDoc | undefined): string[] {
+  const src = body.requiredPetQuestions ?? prev?.requiredPetQuestions ?? []
+  return [...new Set(src.filter(isHandlingKey))]
+}
+
+/** Sanitise provider-authored custom questions (label/type/options/required); drop empty-labelled ones. */
+function resolveCustomQuestions(body: ServiceWriteInput, prev: ServiceDoc | undefined): CustomQuestion[] {
+  const src = body.customQuestions ?? prev?.customQuestions ?? []
+  return src.slice(0, 20).map((q, i): CustomQuestion => {
+    const rawType = String(q?.type ?? '')
+    const type = ((CUSTOM_QUESTION_TYPES as readonly string[]).includes(rawType) ? rawType : 'short_text') as CustomQuestionType
+    const out: CustomQuestion = {
+      id: (q?.id ? String(q.id).slice(0, 40) : '') || `q_${i + 1}`,
+      label: String(q?.label ?? '').trim().slice(0, 200),
+      type,
+      required: !!q?.required
+    }
+    if (isChoiceQuestion(type)) {
+      out.options = (Array.isArray(q?.options) ? q.options : [])
+        .map(o => String(o).trim()).filter(Boolean).slice(0, 12)
+    }
+    return out
+  }).filter(q => q.label.length > 0)
 }
 
 type ServiceLinks = Awaited<ReturnType<typeof resolveServiceLinks>>
@@ -219,6 +255,8 @@ export async function buildServiceDoc(orgId: string, org: OrgServiceContext, bod
     bookingMode: resolveBookingMode(body, prev),
     staffIds: links.staffIds,
     languages: links.languages,
+    requiredPetQuestions: resolveRequiredQuestions(body, prev),
+    customQuestions: resolveCustomQuestions(body, prev),
     tags: tokenizeTags(name),
     status: (body.status ?? prev?.status) === 'hidden' ? 'hidden' : 'active',
     searchCells: links.searchCells

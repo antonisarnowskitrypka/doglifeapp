@@ -61,6 +61,11 @@
         "categoryInvalid": "Wybierz kategorię z tych, które oferuje firma.",
         "deliveryRequired": "Włącz co najmniej jeden tryb realizacji.",
         "locationRequired": "Wybierz co najmniej jedną lokację dla trybu „W lokacji”."
+      },
+      "package": {
+        "notFound": "Nie znaleziono pakietu.",
+        "nameRequired": "Podaj nazwę pakietu (min. 2 znaki).",
+        "servicesRequired": "Wybierz co najmniej jedną usługę, na którą działa pakiet."
       }
     }
   }

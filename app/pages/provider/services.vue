@@ -18,6 +18,7 @@ const org = ref(null)
 const locations = ref([])
 const staff = ref([])
 const services = ref([])
+const packages = ref([])
 
 const currency = computed(() => org.value?.currency || 'PLN')
 const gates = computed(() => ({
@@ -66,16 +67,18 @@ async function loadAll() {
   if (!orgId.value || !isOwner.value) return
   loading.value = true
   try {
-    const [o, locs, st, svc] = await Promise.all([
+    const [o, locs, st, svc, pkg] = await Promise.all([
       authFetch(`/api/orgs/${orgId.value}`),
       authFetch(`/api/orgs/${orgId.value}/locations`),
       authFetch(`/api/orgs/${orgId.value}/staff`),
-      authFetch(`/api/orgs/${orgId.value}/services`)
+      authFetch(`/api/orgs/${orgId.value}/services`),
+      authFetch(`/api/orgs/${orgId.value}/packages`)
     ])
     org.value = o
     locations.value = locs.locations || []
     staff.value = st.members || []
     services.value = svc.services || []
+    packages.value = pkg.packages || []
   } catch (e) {
     toast.add({ title: apiErrorMessage(e, 'provider.services.loadError'), color: 'error' })
   } finally {
@@ -240,6 +243,78 @@ async function save() {
   }
 }
 
+// --- Booking form editor (separate modal: required handling fields + custom questions) ---
+const formModal = reactive({ open: false, saving: false, service: null, requiredPetQuestions: [], customQuestions: [] })
+
+// A service "has a form" once it requires any handling field or defines any custom question.
+function hasForm(s) {
+  return (s.requiredPetQuestions?.length || 0) > 0 || (s.customQuestions?.length || 0) > 0
+}
+function openFormEditor(s) {
+  formModal.service = s
+  formModal.requiredPetQuestions = [...(s.requiredPetQuestions || [])]
+  formModal.customQuestions = (s.customQuestions || []).map(q => ({ ...q, options: [...(q.options || [])] }))
+  formModal.open = true
+}
+
+// Catalogue questions grouped + filtered to the edited service's species (e.g. hide in_heat for cats).
+const formSpecies = computed(() => formModal.service?.species || [])
+function questionVisible(q) {
+  return !q.species || q.species.some(s => formSpecies.value.includes(s))
+}
+const handlingGroups = computed(() =>
+  HANDLING_GROUPS
+    .map(g => ({ key: g, questions: HANDLING_CATALOGUE.filter(q => q.group === g && questionVisible(q)) }))
+    .filter(g => g.questions.length)
+)
+function isRequired(key) {
+  return formModal.requiredPetQuestions.includes(key)
+}
+function toggleRequired(key) {
+  const i = formModal.requiredPetQuestions.indexOf(key)
+  if (i >= 0) formModal.requiredPetQuestions.splice(i, 1)
+  else formModal.requiredPetQuestions.push(key)
+}
+const customTypeItems = computed(() => CUSTOM_QUESTION_TYPES.map(tp => ({ value: tp, label: t(`handling.customTypes.${tp}`) })))
+function addCustomQuestion() {
+  formModal.customQuestions.push({ id: crypto.randomUUID(), label: '', type: 'short_text', options: [], required: false })
+}
+function removeCustomQuestion(i) {
+  formModal.customQuestions.splice(i, 1)
+}
+function setOptions(q, value) {
+  q.options = value.split('\n').map(s => s.trim()).filter(Boolean)
+}
+
+// "Kopiuj z" — borrow another service's form config (other services that already have one).
+const copyOpen = ref(false)
+const copyableServices = computed(() => services.value.filter(s => s.id !== formModal.service?.id && hasForm(s)))
+function copyFormFrom(src) {
+  formModal.requiredPetQuestions = [...(src.requiredPetQuestions || [])]
+  formModal.customQuestions = (src.customQuestions || []).map(q => ({ ...q, id: crypto.randomUUID(), options: [...(q.options || [])] }))
+  copyOpen.value = false
+}
+
+async function saveForm() {
+  if (!orgId.value || !formModal.service) return
+  formModal.saving = true
+  try {
+    const res = await authFetch(`/api/orgs/${orgId.value}/services/${formModal.service.id}`, {
+      method: 'PATCH',
+      body: { requiredPetQuestions: formModal.requiredPetQuestions, customQuestions: formModal.customQuestions }
+    })
+    const saved = res.service
+    const i = services.value.findIndex(s => s.id === saved.id)
+    if (i >= 0) services.value[i] = saved
+    formModal.open = false
+    toast.add({ title: t('provider.services.saved'), color: 'success' })
+  } catch (e) {
+    toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
+  } finally {
+    formModal.saving = false
+  }
+}
+
 // Delete confirmation
 const confirmTarget = ref(null)
 const deleting = ref(false)
@@ -254,6 +329,85 @@ async function doDelete() {
     toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
   } finally {
     deleting.value = false
+  }
+}
+
+// --- Packages (bundles of interchangeable sessions, same tab as services) ---
+const serviceSelectItems = computed(() => services.value.map(s => ({ label: s.name, value: s.id })))
+// Resolve a package's stored service ids to service objects (for badges on the list).
+function packageServices(p) {
+  return (p.serviceIds || []).map(id => services.value.find(s => s.id === id)).filter(Boolean)
+}
+
+const pkgModal = reactive({ open: false, saving: false })
+const pkgForm = reactive({ id: null, name: '', description: '', sessionCount: 5, price: '', serviceIds: [], visible: true })
+
+function openPkgAdd() {
+  pkgForm.id = null
+  pkgForm.name = ''
+  pkgForm.description = ''
+  pkgForm.sessionCount = 5
+  pkgForm.price = ''
+  pkgForm.serviceIds = []
+  pkgForm.visible = true
+  pkgModal.open = true
+}
+function openPkgEdit(p) {
+  pkgForm.id = p.id
+  pkgForm.name = p.name
+  pkgForm.description = p.description || ''
+  pkgForm.sessionCount = p.sessionCount || 1
+  pkgForm.price = fromMinor(p.price)
+  pkgForm.serviceIds = [...(p.serviceIds || [])]
+  pkgForm.visible = p.status !== 'hidden'
+  pkgModal.open = true
+}
+
+const canSavePkg = computed(() =>
+  pkgForm.name.trim().length >= 2 && Number(pkgForm.sessionCount) >= 1 && priceOk(pkgForm.price) && pkgForm.serviceIds.length > 0
+)
+
+async function savePkg() {
+  if (!orgId.value || !canSavePkg.value) return
+  pkgModal.saving = true
+  try {
+    const body = {
+      name: pkgForm.name.trim(),
+      description: pkgForm.description.trim() || null,
+      sessionCount: Math.round(Number(pkgForm.sessionCount) || 1),
+      price: toMinor(pkgForm.price),
+      serviceIds: pkgForm.serviceIds,
+      status: pkgForm.visible ? 'active' : 'hidden'
+    }
+    const res = pkgForm.id
+      ? await authFetch(`/api/orgs/${orgId.value}/packages/${pkgForm.id}`, { method: 'PATCH', body })
+      : await authFetch(`/api/orgs/${orgId.value}/packages`, { method: 'POST', body })
+    const saved = res.package
+    const i = packages.value.findIndex(p => p.id === saved.id)
+    if (i >= 0) packages.value[i] = saved
+    else packages.value.push(saved)
+    pkgModal.open = false
+    toast.add({ title: t('provider.services.packageSaved'), color: 'success' })
+  } catch (e) {
+    toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
+  } finally {
+    pkgModal.saving = false
+  }
+}
+
+const pkgConfirmTarget = ref(null)
+const pkgDeleting = ref(false)
+async function doDeletePkg() {
+  if (!pkgConfirmTarget.value || !orgId.value) return
+  pkgDeleting.value = true
+  try {
+    await authFetch(`/api/orgs/${orgId.value}/packages/${pkgConfirmTarget.value.id}`, { method: 'DELETE' })
+    packages.value = packages.value.filter(p => p.id !== pkgConfirmTarget.value.id)
+    pkgConfirmTarget.value = null
+  } catch (e) {
+    toast.add({ title: apiErrorMessage(e, 'common.toast.saveError'), color: 'error' })
+  } finally {
+    pkgDeleting.value = false
   }
 }
 </script>
@@ -363,47 +517,167 @@ async function doDelete() {
 
           <USeparator class="my-2" />
 
-          <p class="text-xs text-muted">
-            {{ $t('provider.services.perDuration', { min: s.durationMin }) }}
-            <template v-if="minPrice(s) != null">
-              · {{ $t('common.labels.from') }} {{ fromMinor(minPrice(s)) }} {{ currency }}
-            </template>
-          </p>
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-muted">
+                {{ $t('provider.services.perDuration', { min: s.durationMin }) }}
+                <template v-if="minPrice(s) != null">
+                  · {{ $t('common.labels.from') }} {{ fromMinor(minPrice(s)) }} {{ currency }}
+                </template>
+              </p>
 
-          <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
-            <UBadge
-              v-if="s.online?.enabled"
-              :label="$t('provider.services.form.online')"
-              color="neutral"
-              variant="subtle"
-              size="sm"
+              <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+                <UBadge
+                  v-if="s.online?.enabled"
+                  :label="$t('provider.services.form.online')"
+                  color="neutral"
+                  variant="subtle"
+                  size="sm"
+                />
+                <UBadge
+                  v-if="s.atClient?.enabled"
+                  :label="$t('provider.services.form.atClient')"
+                  color="neutral"
+                  variant="subtle"
+                  size="sm"
+                />
+                <AppChip
+                  v-for="loc in serviceLocations(s)"
+                  :key="loc.id"
+                  :color="loc.color"
+                  :icon="loc.icon || 'i-lucide-map-pin'"
+                  :label="loc.name"
+                />
+              </div>
+
+              <div
+                v-if="serviceStaff(s).length"
+                class="flex flex-wrap gap-1.5 mt-1.5"
+              >
+                <AppChip
+                  v-for="m in serviceStaff(s)"
+                  :key="m.membershipId"
+                  :color="m.color || ''"
+                  :avatar="m.avatarUrl || ''"
+                  :label="staffLabel(m)"
+                />
+              </div>
+            </div>
+
+            <div class="flex shrink-0 flex-col items-end gap-2">
+              <UButton
+                :label="hasForm(s) ? $t('provider.services.form.editFormButton') : $t('provider.services.form.addFormButton')"
+                :icon="hasForm(s) ? 'i-lucide-clipboard-list' : 'i-lucide-clipboard-plus'"
+                :color="hasForm(s) ? 'neutral' : 'primary'"
+                variant="outline"
+                size="xs"
+                @click="openFormEditor(s)"
+              />
+              <UButton
+                :label="$t('provider.services.form.sessionSchemaButton')"
+                icon="i-lucide-workflow"
+                color="neutral"
+                variant="outline"
+                size="xs"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Packages: bundles of interchangeable sessions, same tab as services -->
+      <div
+        v-if="services.length || packages.length"
+        class="space-y-2"
+      >
+        <div class="flex items-center justify-between gap-4">
+          <h2 class="flex items-center gap-2 text-sm font-semibold text-muted uppercase tracking-wide">
+            <UIcon
+              name="i-lucide-package"
+              class="size-4"
             />
-            <UBadge
-              v-if="s.atClient?.enabled"
-              :label="$t('provider.services.form.atClient')"
+            {{ $t('provider.services.packagesHeading') }}
+          </h2>
+          <UButton
+            :label="$t('provider.services.addPackage')"
+            icon="i-lucide-plus"
+            color="primary"
+            variant="outline"
+            size="xs"
+            @click="openPkgAdd"
+          />
+        </div>
+
+        <div
+          v-if="!packages.length"
+          class="rounded-lg border border-dashed border-default p-6 text-center text-sm text-muted"
+        >
+          {{ $t('provider.services.packageEmpty') }}
+        </div>
+
+        <div
+          v-for="p in packages"
+          :key="p.id"
+          class="rounded-lg border border-default p-3"
+        >
+          <div class="flex items-start gap-2">
+            <div class="min-w-0 flex-1">
+              <p class="flex items-center gap-2 font-medium">
+                <span class="truncate">{{ p.name }}</span>
+                <UBadge
+                  v-if="p.status === 'hidden'"
+                  :label="$t('provider.services.hiddenBadge')"
+                  color="neutral"
+                  variant="subtle"
+                  size="sm"
+                />
+              </p>
+              <p
+                v-if="p.description"
+                class="text-xs text-muted mt-0.5 line-clamp-1"
+              >
+                {{ p.description }}
+              </p>
+            </div>
+            <UButton
+              icon="i-lucide-pencil"
               color="neutral"
-              variant="subtle"
+              variant="ghost"
               size="sm"
+              :aria-label="$t('common.actions.edit')"
+              @click="openPkgEdit(p)"
             />
-            <AppChip
-              v-for="loc in serviceLocations(s)"
-              :key="loc.id"
-              :color="loc.color"
-              :icon="loc.icon || 'i-lucide-map-pin'"
-              :label="loc.name"
+            <UButton
+              icon="i-lucide-trash-2"
+              color="error"
+              variant="ghost"
+              size="sm"
+              :aria-label="$t('common.actions.delete')"
+              @click="pkgConfirmTarget = p"
             />
           </div>
 
+          <USeparator class="my-2" />
+
+          <p class="text-xs text-muted">
+            {{ $t('provider.services.packageSessions', { count: p.sessionCount }) }}
+            <template v-if="p.price">
+              · {{ fromMinor(p.price) }} {{ currency }}
+            </template>
+          </p>
+
           <div
-            v-if="serviceStaff(s).length"
+            v-if="packageServices(p).length"
             class="flex flex-wrap gap-1.5 mt-1.5"
           >
-            <AppChip
-              v-for="m in serviceStaff(s)"
-              :key="m.membershipId"
-              :color="m.color || ''"
-              :avatar="m.avatarUrl || ''"
-              :label="staffLabel(m)"
+            <UBadge
+              v-for="s in packageServices(p)"
+              :key="s.id"
+              :label="s.name"
+              color="neutral"
+              variant="subtle"
+              size="sm"
             />
           </div>
         </div>
@@ -688,6 +962,173 @@ async function doDelete() {
       </template>
     </UModal>
 
+    <!-- Booking form editor (dedicated modal: required handling fields + custom questions) -->
+    <UModal
+      v-model:open="formModal.open"
+      :title="$t('provider.services.form.formModalTitle', { name: formModal.service?.name || '' })"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm text-muted">
+            {{ $t('provider.services.form.formHint') }}
+          </p>
+
+          <!-- Section 1: which catalogue (handling) fields this service requires -->
+          <div class="space-y-3">
+            <p class="text-sm font-medium">
+              {{ $t('provider.services.form.handlingHeading') }}
+            </p>
+            <div
+              v-for="g in handlingGroups"
+              :key="g.key"
+              class="space-y-1.5"
+            >
+              <p class="text-xs font-medium uppercase tracking-wide text-dimmed">
+                {{ $t(`handling.groups.${g.key}`) }}
+              </p>
+              <div class="grid gap-1.5 sm:grid-cols-2">
+                <UCheckbox
+                  v-for="q in g.questions"
+                  :key="q.key"
+                  :model-value="isRequired(q.key)"
+                  :label="$t(`handling.q.${q.key}`)"
+                  @update:model-value="toggleRequired(q.key)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <USeparator />
+
+          <!-- Section 2: provider-authored questions answered fresh each booking -->
+          <div class="space-y-3">
+            <div>
+              <p class="text-sm font-medium">
+                {{ $t('provider.services.form.customHeading') }}
+              </p>
+              <p class="text-xs text-muted mt-0.5">
+                {{ $t('provider.services.form.customHint') }}
+              </p>
+            </div>
+
+            <div
+              v-for="(q, i) in formModal.customQuestions"
+              :key="q.id"
+              class="space-y-2 rounded-lg border border-default p-3"
+            >
+              <div class="flex items-start gap-2">
+                <UInput
+                  v-model="q.label"
+                  :placeholder="$t('provider.services.form.customLabelPlaceholder')"
+                  class="flex-1"
+                />
+                <UButton
+                  icon="i-lucide-trash-2"
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  :aria-label="$t('common.actions.delete')"
+                  @click="removeCustomQuestion(i)"
+                />
+              </div>
+              <div class="grid items-center gap-2 sm:grid-cols-2">
+                <USelectMenu
+                  v-model="q.type"
+                  :items="customTypeItems"
+                  value-key="value"
+                  class="w-full"
+                />
+                <div class="flex items-center justify-end gap-2">
+                  <span class="text-sm text-muted">{{ $t('provider.services.form.customRequired') }}</span>
+                  <USwitch v-model="q.required" />
+                </div>
+              </div>
+              <UFormField
+                v-if="isChoiceQuestion(q.type)"
+                :label="$t('provider.services.form.customOptions')"
+                :hint="$t('provider.services.form.customOptionsHint')"
+              >
+                <UTextarea
+                  :model-value="(q.options || []).join('\n')"
+                  :rows="3"
+                  class="w-full"
+                  @update:model-value="v => setOptions(q, v)"
+                />
+              </UFormField>
+            </div>
+
+            <p
+              v-if="!formModal.customQuestions.length"
+              class="text-xs text-muted"
+            >
+              {{ $t('provider.services.form.customEmpty') }}
+            </p>
+            <UButton
+              :label="$t('provider.services.form.customAdd')"
+              icon="i-lucide-plus"
+              color="neutral"
+              variant="outline"
+              size="sm"
+              @click="addCustomQuestion"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex w-full items-center justify-between gap-2">
+          <UPopover v-model:open="copyOpen">
+            <UButton
+              :label="$t('provider.services.form.copyFrom')"
+              icon="i-lucide-copy"
+              trailing-icon="i-lucide-chevron-down"
+              color="neutral"
+              variant="outline"
+              size="sm"
+            />
+            <template #content>
+              <div class="max-h-64 min-w-56 overflow-auto p-1">
+                <button
+                  v-for="s in copyableServices"
+                  :key="s.id"
+                  type="button"
+                  class="flex w-full items-center justify-between gap-3 rounded-md px-2 py-1.5 text-left text-sm hover:bg-elevated"
+                  @click="copyFormFrom(s)"
+                >
+                  <span class="truncate">{{ s.name }}</span>
+                  <span class="shrink-0 text-xs text-dimmed">
+                    {{ (s.requiredPetQuestions?.length || 0) + (s.customQuestions?.length || 0) }}
+                  </span>
+                </button>
+                <p
+                  v-if="!copyableServices.length"
+                  class="px-2 py-1.5 text-xs text-muted"
+                >
+                  {{ $t('provider.services.form.copyEmpty') }}
+                </p>
+              </div>
+            </template>
+          </UPopover>
+
+          <div class="flex gap-2">
+            <UButton
+              :label="$t('common.actions.cancel')"
+              color="neutral"
+              variant="ghost"
+              @click="formModal.open = false"
+            />
+            <UButton
+              :label="$t('common.actions.save')"
+              color="primary"
+              icon="i-lucide-check"
+              :loading="formModal.saving"
+              @click="saveForm"
+            />
+          </div>
+        </div>
+      </template>
+    </UModal>
+
     <!-- Delete confirmation -->
     <UModal
       :open="!!confirmTarget"
@@ -713,6 +1154,135 @@ async function doDelete() {
             icon="i-lucide-trash-2"
             :loading="deleting"
             @click="doDelete"
+          />
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Package create / edit modal -->
+    <UModal
+      v-model:open="pkgModal.open"
+      :title="pkgForm.id ? $t('provider.services.pkgForm.editTitle') : $t('provider.services.pkgForm.createTitle')"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <UFormField :label="$t('provider.services.pkgForm.name')">
+            <UInput
+              v-model="pkgForm.name"
+              :placeholder="$t('provider.services.pkgForm.namePlaceholder')"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            :label="$t('provider.services.pkgForm.description')"
+            :hint="$t('common.labels.optional')"
+          >
+            <UTextarea
+              v-model="pkgForm.description"
+              :rows="2"
+              autoresize
+              class="w-full"
+            />
+          </UFormField>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <UFormField :label="$t('provider.services.pkgForm.sessionCount')">
+              <UInput
+                v-model="pkgForm.sessionCount"
+                type="number"
+                min="1"
+                step="1"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField :label="$t('provider.services.pkgForm.price')">
+              <UInput
+                v-model="pkgForm.price"
+                type="number"
+                min="0"
+                step="0.01"
+                class="w-full"
+              >
+                <template #trailing>
+                  <span class="text-xs text-muted">{{ currency }}</span>
+                </template>
+              </UInput>
+            </UFormField>
+          </div>
+
+          <UFormField
+            :label="$t('provider.services.pkgForm.services')"
+            :hint="$t('provider.services.pkgForm.servicesHint')"
+          >
+            <USelectMenu
+              v-model="pkgForm.serviceIds"
+              :items="serviceSelectItems"
+              value-key="value"
+              multiple
+              class="w-full"
+              :placeholder="$t('provider.services.pkgForm.servicesPlaceholder')"
+            />
+            <p
+              v-if="!services.length"
+              class="text-xs text-muted mt-1"
+            >
+              {{ $t('provider.services.pkgForm.noServices') }}
+            </p>
+          </UFormField>
+
+          <div class="flex items-center justify-between gap-4">
+            <span class="text-sm font-medium">{{ $t('provider.services.pkgForm.visible') }}</span>
+            <USwitch v-model="pkgForm.visible" />
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton
+            :label="$t('common.actions.cancel')"
+            color="neutral"
+            variant="ghost"
+            @click="pkgModal.open = false"
+          />
+          <UButton
+            :label="$t('common.actions.save')"
+            color="primary"
+            icon="i-lucide-check"
+            :loading="pkgModal.saving"
+            :disabled="!canSavePkg"
+            @click="savePkg"
+          />
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Package delete confirmation -->
+    <UModal
+      :open="!!pkgConfirmTarget"
+      :title="$t('provider.services.packageDeleteConfirmTitle')"
+      @update:open="(v) => { if (!v) pkgConfirmTarget = null }"
+    >
+      <template #body>
+        <p class="text-sm text-muted">
+          {{ $t('provider.services.packageDeleteConfirmBody', { name: pkgConfirmTarget?.name }) }}
+        </p>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton
+            :label="$t('common.actions.cancel')"
+            color="neutral"
+            variant="ghost"
+            @click="pkgConfirmTarget = null"
+          />
+          <UButton
+            :label="$t('common.actions.delete')"
+            color="error"
+            icon="i-lucide-trash-2"
+            :loading="pkgDeleting"
+            @click="doDeletePkg"
           />
         </div>
       </template>

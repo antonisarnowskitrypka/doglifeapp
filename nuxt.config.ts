@@ -93,6 +93,7 @@ export default defineNuxtConfig({
           'pl/account.json',
           'pl/appSettings.json',
           'pl/provider.json',
+          'pl/handling.json',
           'pl/geo.json',
           'pl/onboarding.json',
           'pl/home.json',

@@ -9,15 +9,20 @@ Two distinct products built on the same session-consumption mechanics:
 
 ### `packageDefinition` (defined by provider)
 
+Stored as a subcollection `organizations/{orgId}/packages` (mirrors `…/services`), created/edited by the owner on [`/provider/services`](./35-pages-and-routes.md) (same tab as single services — the "Dodaj pakiet" action).
+
 ```
 name: string
-description: string
-sessionCount: number
-price: number
-currency: string
-serviceId: string
+description: string | null
+sessionCount: number            // 1..100
+price: number                   // total package price, integer minor units in the org currency
+serviceIds: string[]            // services the sessions can be redeemed against (≥1; validated vs the org's services)
+status: 'active' | 'hidden'
 organizationId: string
+createdAt: timestamp
 ```
+
+`serviceIds` is a **set of interchangeable services** (a session from the bundle may be booked against any of them) — superseding the earlier single `serviceId`. Price is one flat total regardless of which listed service a session is redeemed on. Currency is the org currency (not stored per package, matching `service` pricing).
 
 ### `packagePurchase` (per customer purchase)
 

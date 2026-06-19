@@ -1,0 +1,70 @@
+{
+  "handling": {
+    "groups": {
+      "social": "Zachowanie społeczne",
+      "safety": "Bezpieczeństwo",
+      "health": "Zdrowie",
+      "care": "Pielęgnacja i obsługa",
+      "logistics": "Samodzielność i logistyka",
+      "training": "Doświadczenie i szkolenie",
+      "guidance": "Wskazówki dla usługodawcy"
+    },
+    "scales": {
+      "attitude": {
+        "friendly": "Przyjazny",
+        "neutral": "Neutralny",
+        "unsure": "Niepewny",
+        "reactive": "Reaktywny",
+        "aggressive": "Agresywny"
+      },
+      "tolerance": {
+        "calm": "Spokojnie",
+        "tolerates": "Toleruje",
+        "with_difficulty": "Z trudem",
+        "stressed": "Stresuje się",
+        "aggressive": "Reaguje agresją"
+      },
+      "offleash": {
+        "yes": "Tak",
+        "conditional": "Warunkowo",
+        "no": "Nie"
+      },
+      "alone": {
+        "yes": "Tak",
+        "short": "Krótko",
+        "no": "Nie"
+      }
+    },
+    "q": {
+      "attitude_people": "Stosunek do obcych ludzi",
+      "attitude_dogs": "Stosunek do innych psów",
+      "attitude_children": "Stosunek do dzieci",
+      "bite_history_human": "Historia ugryzienia człowieka",
+      "bite_history_dog": "Historia pogryzienia lub konfliktu z innym psem",
+      "resource_guarding": "Obrona zasobów (jedzenie, zabawki, legowisko)",
+      "muzzle": "Korzysta z kagańca",
+      "medication": "Przyjmuje stałe leki",
+      "allergies": "Alergie lub nietolerancje pokarmowe",
+      "health_limitations": "Ograniczenia zdrowotne lub ruchowe",
+      "fears": "Lęki lub fobie",
+      "in_heat": "Suka jest lub może być w cieczce",
+      "grooming_vet_tolerance": "Jak znosi zabiegi pielęgnacyjne i weterynaryjne",
+      "handling_rules": "Szczególne zasady obsługi",
+      "offleash": "Może być spuszczany ze smyczy",
+      "alone_ok": "Dobrze zostaje sam",
+      "car_travel": "Toleruje podróż samochodem",
+      "commands": "Zna i wykonuje podstawowe komendy",
+      "group_experience": "Doświadczenie z zajęciami grupowymi lub eventami",
+      "boarding_experience": "Doświadczenie z petsitterem lub hotelem",
+      "rewards": "Ulubione nagrody lub motywatory",
+      "warnings": "Zachowania, o których warto uprzedzić",
+      "avoid": "Sytuacje, których należy bezwzględnie unikać"
+    },
+    "customTypes": {
+      "short_text": "Krótki tekst",
+      "long_text": "Długi tekst",
+      "single_choice": "Jednokrotny wybór",
+      "multi_choice": "Wielokrotny wybór"
+    }
+  }
+}
